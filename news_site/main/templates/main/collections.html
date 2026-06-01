@@ -1,0 +1,49 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+<div class="collections-page">
+
+    <h1 class="page-title">Мои коллекции новостей</h1>
+
+    <div id="collections-container">
+        <!-- JS заполнит сюда карточки коллекций -->
+    </div>
+
+    <!-- Правая панель с новостями -->
+    <div id="collection-detail" class="collection-detail" style="display: none;">
+        <div class="detail-header">
+            <button onclick="closeDetailPanel()" class="back-btn">← Назад</button>
+            <h2 id="detail-collection-name"></h2>
+        </div>
+        <div id="news-list" class="news-list"></div>
+    </div>
+
+</div>
+
+<!-- Модальное окно редактирования коллекции -->
+<div id="edit-collection-modal" class="modal hidden">
+    <span class="close-btn" onclick="closeEditModal()">×</span>
+    
+    <h2>Редактирование коллекции</h2>
+
+    <label for="edit-collection-name">Наименование</label>
+    <input type="text" id="edit-collection-name" placeholder="Введите название" autocomplete="off">
+
+    <label for="edit-collection-description">Описание</label>
+    <input type="text" id="edit-collection-description" placeholder="Введите описание" autocomplete="off">
+
+    <div id="edit-collection-error" class="error-message"></div>
+
+    <div class="modal-buttons">
+        <button onclick="closeEditModal()" class="gray-btn">Отмена</button>
+        <button onclick="saveCollectionChanges()" class="blue-btn">Сохранить</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'main/js/collections.js' %}"></script>
+{% endblock %}

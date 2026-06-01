@@ -1,0 +1,218 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>News</title>
+    
+    <link rel="stylesheet" href="{% static 'main/css/style.css' %}">
+    <script defer src="{% static 'main/js/app.js' %}"></script>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+    <div class="logo" onclick="goHome()">T</div>
+
+    <div class="search-wrapper" id="searchWrapper">
+        <input type="text" class="search-bar" id="searchInput" placeholder="Поиск новостей" autocomplete="off">
+        <span class="search-icon">🔍</span>
+
+        <div id="searchHistoryDropdown" class="search-history hidden"></div>
+    </div>
+
+    <div class="profile" onclick="toggleProfileMenu()">
+        👤
+        <div class="dropdown hidden" id="profileMenu">
+            <div onclick="openLoginModal(event)">Войти</div>
+            <div onclick="openRegisterModal(event)">Зарегистрироваться</div>
+        </div>
+    </div>
+</header>
+
+<!-- ОСНОВНОЙ LAYOUT -->
+<div class="main-layout">
+
+    <!-- САЙДБАР -->
+    <nav class="tabs">
+        <div class="tab" onclick="goHome()">🏠 Главная</div>
+        <div class="tab" onclick="goCollections()">📁 Коллекции</div>
+        <div class="tab" onclick="focusSearch()">🔎 Поиск</div>
+        <div class="tab" onclick="goStats()">📊 Статистика</div>
+    </nav>
+
+    <!-- КОНТЕНТ -->
+    <div class="content">
+        {% block content %}{% endblock %}
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <nav class="footer-tabs">
+        <div class="footer-tab" onclick="goSupport()">Поддержка</div>
+        <div class="footer-tab" onclick="goAgreement()">Пользовательское соглашение</div>
+    </nav>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div id="loginModal" class="modal hidden">
+    <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
+    <label>Email</label>
+    <input type="text" id="login_email">
+    <label>Пароль</label>
+    <input type="password" id="login_password">
+    <button type="button" class="blue-btn" onclick="validateAndLogin()">
+        Войти
+    </button>
+</div>
+
+<!-- REGISTER MODAL -->
+<div id="registerModal" class="modal hidden">
+    <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
+    <label>Email</label>
+    <input type="text" id="reg_email">
+    <label>Пароль</label>
+    <input type="password" id="reg_password">
+    <label>Имя</label>
+    <input type="text" id="reg_name">
+    <button type="button" class="blue-btn" onclick="validateAndRegister()">Зарегистрироваться</button>
+</div>
+
+<!-- EMAIL VERIFICATION MODAL -->
+<div id="verifyEmailModal" class="modal hidden">
+    <span class="close-btn" onclick="closeVerifyModal()">&times;</span>
+    
+    <h2>Подтвердите email</h2>
+    <p>Мы отправили 4-значный код на <strong id="verify_email_display"></strong></p>
+    
+    <div class="code-inputs" id="codeInputs">
+        <input type="text" maxlength="1" class="code-digit" inputmode="numeric" pattern="\d*" autocomplete="one-time-code" oninput="handleCodeInput(this)">
+        <input type="text" maxlength="1" class="code-digit" inputmode="numeric" pattern="\d*" autocomplete="one-time-code" oninput="handleCodeInput(this)">
+        <input type="text" maxlength="1" class="code-digit" inputmode="numeric" pattern="\d*" autocomplete="one-time-code" oninput="handleCodeInput(this)">
+        <input type="text" maxlength="1" class="code-digit" inputmode="numeric" pattern="\d*" autocomplete="one-time-code" oninput="handleCodeInput(this)">
+    </div>
+    
+    <div id="codeError" class="error-message hidden">Неверный код. Попробуйте ещё раз.</div>
+    
+    <button type="button" class="blue-btn" onclick="submitVerCodeUserLogin()">Подтвердить</button>
+    
+    <!-- <button type="button" class="link-btn" id="resendBtn" onclick="resendCode()" disabled>
+        Отправить код ещё раз (<span id="resendTimer">60</span> сек)
+    </button> -->
+</div>
+
+<!-- 2FA SETUP MODAL -->
+<div id="setup2FAModal" class="modal hidden">
+    <span class="close-btn" onclick="close2FAModal()">&times;</span>
+    
+    <h2>Настройка Google Authenticator</h2>
+    <p>Отсканируйте QR-код в приложении<br>Google Authenticator</p>
+    
+    <div style="text-align: center; margin: 25px 0 30px;">
+        <img id="qrCodeImage" src="" alt="QR Code" 
+             style="max-width: 260px; height: auto; background: white; padding: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+    </div>
+
+    <p style="text-align:center; font-size:14px; color:#555; margin-bottom: 20px;">
+        Введите 6-значный код из приложения:
+    </p>
+    
+    <div class="code-inputs" id="totpCodeInputs">
+    </div>
+    
+    <div id="totpCodeError" class="error-message hidden">Неверный код. Попробуйте ещё раз.</div>
+    
+    <button type="button" class="blue-btn" onclick="submit2FACode()">
+        Подтвердить и завершить регистрацию
+    </button>
+</div>
+
+<!-- TOAST NOTIFICATION -->
+<div id="toast" class="toast">
+    <span id="toast-text"></span>
+</div>
+
+<button id="scrollToTopBtn" class="scroll-to-top" title="Наверх">
+    ↑
+</button>
+
+{% block scripts %}
+<!-- сюда подставится tech_sup.js и другие -->
+{% endblock %}
+
+
+</body>
+
+<style>
+    :root {
+        --header-height: 50px;
+        --sidebar-width: 240px;
+    }
+
+    .header {
+        display: flex;
+        align-items: center;
+        padding: 15px 20px;
+        background: #1e3a8a;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+
+        .header {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        height: var(--header-height) !important;
+        z-index: 1100 !important;
+    }
+
+    .main-layout {
+        display: flex;
+    }
+
+    .main-layout {
+        padding-top: var(--header-height) !important;
+        padding-left: var(--sidebar-width) !important;
+        min-height: 100dvh !important;
+        box-sizing: border-box !important;
+    }
+
+    .tabs {
+        width: 240px;
+        min-width: 240px;
+        padding: 20px 0;
+        background: #fafafa;
+        border-right: 1px solid #ddd;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+    }
+
+    .tabs {
+        position: fixed !important;
+        top: var(--header-height) !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        padding-top: 30px !important;    
+        z-index: 1000 !important;
+    }
+
+    .footer {
+        padding: 10px;
+        background: #f5f5f5;
+    }
+
+    .footer {
+        margin-left: var(--sidebar-width) !important;
+        width: calc(100% - var(--sidebar-width)) !important;
+        z-index: 900 !important;
+    }
+
+</style>
+</html>

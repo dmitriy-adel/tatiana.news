@@ -1,0 +1,65 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<div class="tech-sup-page">
+    <h1 class="page-title">Техническая поддержка</h1>
+    
+    <div class="support-container">
+        
+        <div class="support-form">
+            <h2>Напишите нам</h2>
+            <form id="supportForm">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label>Ваше имя</label>
+                    <input type="text" id="name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Тема обращения</label>
+                    <select id="subject">
+                        <option value="Вопрос по сайту">Вопрос по сайту</option>
+                        <option value="Проблема с аккаунтом">Проблема с аккаунтом</option>
+                        <option value="Техническая неисправность">Техническая неисправность</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Сообщение</label>
+                    <textarea id="message" rows="8" required></textarea>
+                </div>
+                
+                <button type="submit" class="blue-btn" id="submitBtn">Отправить сообщение</button>
+            </form>
+        </div>
+
+        <div class="support-info">
+            <h2>Как мы можем помочь?</h2>
+            <div class="info-card">
+                <h3>Часто задаваемые вопросы</h3>
+                <p>Посмотрите <a href="{% url 'user_agreement' %}" target="_blank">FAQ и Пользовательское соглашение</a></p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Контакты</h3>
+                <p><strong>Email:</strong> gerrenme2608@gmail.com</p>
+                <p><strong>Телефон:</strong> +7 (996) 282-00-34</p>
+                <p><strong>Время работы:</strong> Пн–Пт с 9:00 до 18:00</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'main/js/tech_sup.js' %}"></script>
+{% endblock %}
