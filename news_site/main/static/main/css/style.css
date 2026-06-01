@@ -1,0 +1,1503 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+}
+
+/* ==================== ОБЩИЕ / LAYOUT ==================== */
+/* .header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background: #1e3a8a;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    position: relative; 
+    z-index: 100;
+} */
+
+.logo {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 24px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.15);
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.logo:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.search-wrapper {
+    flex: 1;
+    position: relative;
+    margin: 0 25px;
+    max-width: 560px;
+}
+
+.search-bar {
+    width: 100%;
+    padding: 12px 12px 12px 45px;
+    border-radius: 30px;
+    border: none;
+    background: rgba(255, 255, 255, 0.95);
+    color: #1e3a8a;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    height: 48px;           
+}
+
+.search-bar:focus {
+    outline: none;
+    background: white;
+}
+
+.search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 20px;
+    pointer-events: none;
+}
+
+.profile {
+    cursor: pointer;
+    font-size: 26px;
+    padding: 8px 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.15);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-left: auto;
+}
+
+.profile:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.dropdown {
+    position: absolute;
+    right: 15px;
+    top: 68px;
+    background: white;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    min-width: 170px;
+    z-index: 1000;
+}
+
+.dropdown div {
+    padding: 10px 16px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.dropdown div:hover {
+    background: #f8f9ff;
+}
+
+.categories {
+    display: flex !important;
+    justify-content: center;
+    gap: 40px;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+}
+
+.category {
+    cursor: pointer !important;
+    font-weight: 500;
+}
+
+.category:hover {
+    color: #1e3a8a;
+}
+
+/* .main-layout {
+    display: flex;
+} */
+
+/* .tabs {
+    width: 240px;
+    min-width: 240px;
+    padding: 20px 0;
+    background: #fafafa;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 140px);
+    overflow-y: auto;
+} */
+
+.tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 15px;
+    color: #555;
+}
+
+.tab:hover {
+    background: #e8f0fe;
+    color: #1e3a8a;
+}
+
+.tabs::after {
+    content: '';
+    display: block;
+    margin: 15px 24px;
+    height: 1px;
+    background: #ddd;
+}
+
+.footer-tabs {
+    margin-top: auto;
+    padding: 10px 0;
+}
+
+.footer-tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #555;
+}
+
+.footer-tab:hover {
+    background: #f0f0f0;
+    color: #1e3a8a;
+}
+
+.content {
+    flex: 1;
+    padding: 20px;
+}
+
+/* .footer {
+    padding: 10px;
+    background: #f5f5f5;
+} */
+
+/* !!==================== ОБЩИЕ / LAYOUT ====================!! */
+
+/* ==================== МОДАЛКИ ==================== */
+.modal {
+    position: fixed; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%); 
+    background: white; 
+    padding: 30px 40px; 
+    border-radius: 15px; 
+    z-index: 100; 
+    width: 300px; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
+    display: flex; 
+    flex-direction: column; 
+    gap: 15px; 
+    box-sizing: border-box; 
+} 
+
+.hidden { 
+    display: none !important; /* важно — чтобы модалки не показывались по умолчанию */ 
+} 
+
+.modal label { 
+    font-size: 14px; 
+    margin-bottom: 5px; 
+    font-weight: bold; 
+} 
+
+.modal input { 
+    padding: 10px; 
+    border-radius: 8px; 
+    border: 1px solid #ccc; 
+    font-size: 14px; 
+    width: 100%; 
+    box-sizing: border-box; 
+} 
+
+.modal input.error { 
+    border-color: rgb(255, 0, 0); 
+} 
+
+
+/* !!==================== МОДАЛКИ ====================!! */
+
+/* ==================== ТЕХНИЧЕСКАЯ ПОДДЕРЖКА ==================== */
+.tech-sup-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 30px 20px;
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: #1e3a8a;
+}
+
+.support-container {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+}
+
+.support-form {
+    background: white;
+    padding: 35px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.support-form h2 {
+    margin-bottom: 25px;
+    color: #1e3a8a;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #444;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.blue-btn {
+    width: 100%;
+    padding: 14px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.blue-btn:hover {
+    background: #16326f;
+}
+
+.support-info .info-card {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+}
+
+/*форма тех. поддержки*/
+/* SUCCESS MODAL */
+#successModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+#successModal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.success-icon {
+    font-size: 60px;
+    margin-bottom: 15px;
+}
+
+.modal-content h2 {
+    margin: 10px 0 15px;
+    color: #1e3a8a;
+}
+
+.modal-content p {
+    color: #555;
+    margin-bottom: 25px;
+    line-height: 1.5;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    cursor: pointer;
+    color: #999;
+}
+
+.close-btn:hover {
+    color: #333;
+}
+
+/* !!==================== ТЕХНИЧЕСКАЯ ПОДДЕРЖКА ====================!! */
+
+/* ==================== КОЛЛЕКЦИИ НОВОСТЕЙ ==================== */
+
+.collections-page {
+    display: flex;
+    gap: 20px;
+    min-height: calc(100vh - 180px);
+}
+
+
+#collections-container {
+    flex: 1;
+}
+
+.collection-detail {
+    width: 420px;
+    background: #f8f9fa;
+    border-left: 1px solid #ddd;
+    padding: 20px;
+    overflow-y: auto;
+} 
+
+.collection-detail {
+    position: fixed;           
+    top: 80px;                
+    right: 20px;               
+    width: 420px;             
+    height: calc(100vh - 100px); 
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;
+}
+
+.collections-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.collection-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+
+    position: relative;
+}
+
+.collection-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    border-color: #0066ff;
+}
+
+.collection-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.1rem;
+}
+
+
+.collection-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.settings-btn {
+    font-size: 1.3rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    opacity: 0.7;
+}
+
+.settings-btn:hover {
+    background: #f0f0f0;
+    opacity: 1;
+}
+
+.collection-menu .menu-item {
+    padding: 10px 16px;
+    cursor: pointer;
+}
+
+.collection-menu .menu-item:hover {
+    background: #f5f5f5;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.gray-btn {
+    background: #6c757d;
+    color: white;
+}
+
+
+.comment {
+    color: #555;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+}
+
+.collection-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.news-count { font-weight: 600; color: #0066ff; }
+
+.detail-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+} 
+
+.back-btn {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+
+ .news-item {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+} 
+
+.detail-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+    flex-shrink: 0;            
+}
+
+.news-list {
+    flex: 1;                   
+    overflow-y: auto;          
+    padding: 16px 20px;
+    scrollbar-width: thin;     
+}
+
+.news-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.news-list::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.news-list::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+.news-item {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.news-item:last-child {
+    margin-bottom: 0;
+}
+
+.news-item:hover {
+    border-color: #0066ff;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.news-source {
+    color: #666;
+    font-size: 0.9rem;
+    margin: 6px 0;
+}
+
+.news-preview {
+    color: #444;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.loading, .empty-state, .error-state, .auth-required {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+/* !!==================== КОЛЛЕКЦИИ НОВОСТЕЙ ====================!! */
+
+/* ==================== КОД ВЕРИФИКАЦИИ ==================== */
+
+.code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px 0;
+}
+
+.code-digit {
+    width: 55px;
+    height: 65px;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s;
+}
+
+.code-digit:focus {
+    border-color: #4a90e2;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.code-digit.error {
+    border-color: #e74c3c;
+    background: #fff0f0;
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-6px); }
+    75% { transform: translateX(6px); }
+}
+
+.error-message {
+    color: #e74c3c;
+    text-align: center;
+    margin: 10px 0 15px;
+    font-weight: 500;
+}
+
+/* !!==================== КОД ВЕРИФИКАЦИИ ====================!! */
+
+/* ==================== КАТЕГОРИИ НОВОСТЕЙ НА ГЛАВНОЙ СТРАНИЦЕ ==================== */
+
+.category-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    margin-bottom: 30px;
+    width: 100%;
+    overflow: hidden;
+}
+
+.categories-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    flex: 1 1 auto;
+    padding: 6px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap;           
+    scroll-snap-type: x mandatory;
+}
+
+.categories-container::-webkit-scrollbar {
+    display: none;
+}
+
+.category-pill {
+    position: flex;
+    background: #fff;
+    color: #333;
+
+    padding: 12px 18px;
+
+    border-radius: 14px; 
+    
+    font-size: 14px;
+    font-weight: 200;
+
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+
+    flex: 0 0 calc((100% - 10 * 12px) / 6);
+
+    cursor: pointer;
+    transition: all 0.25s ease;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    scroll-snap-align: start;
+}
+
+.category-pill:hover {
+    background: #007bff;
+    color: white;
+}
+
+.scroll-btn {
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #444;
+    font-size: 24px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.scroll-btn.visible {
+    display: flex;
+}
+
+.scroll-btn:hover {
+    background: #007bff;
+    color: white;
+}
+
+.loading-text {
+    padding: 12px 20px;
+    color: #777;
+    white-space: nowrap;
+}
+
+
+
+/* !!==================== КАТЕГОРИИ НОВОСТЕЙ НА ГЛАВНОЙ СТРАНИЦЕ ====================!! */
+
+/* ==================== ТОАСТ ==================== */
+
+.toast {
+    position: fixed;
+    bottom: -100px;
+    right: 20px;
+    color: white;
+    padding: 14px 24px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    font-size: 15px;
+    font-weight: 500;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    max-width: 320px;
+    word-wrap: break-word;
+}
+
+/* Синий вариант (по умолчанию) */
+.toast-blue {
+    background-color: #007bff;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Красный вариант */
+.toast-red {
+    background-color: #dc3545;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+.toast.show {
+    bottom: 20px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* !!==================== ТОАСТ ====================!! */
+
+/* ==================== АУТЕНТИФИКАЦИЯ  ?? ==================== */
+
+.empty-state, .auth-required {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.auth-required h2 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* !!==================== АУТЕНТИФИКАЦИЯ  ?? ====================!! */
+
+
+/* НОВОЕ */
+
+.news-section {
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-size: 1.8rem;
+    margin: 20px 0 15px 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+}
+
+.news-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+}
+
+.news-card.big {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.news-card.big:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.news-item.small {
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+}
+
+.news-item.small:last-child {
+    border-bottom: none;
+}
+
+.news-title {
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+}
+
+.news-text {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.news-meta {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 10px;
+}
+
+/* ====================== КНОПКА "НАВЕРХ" ====================== */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: #1e3a8a;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    z-index: 999;
+    transition: all 0.3s ease;
+    opacity: 0;
+}
+
+.scroll-to-top:hover {
+    background: #2c4a9c;
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
+}
+
+.scroll-to-top.show {
+    display: flex;
+    opacity: 1;
+}
+
+/* Когда футер виден — поднимаем кнопку выше */
+.footer-visible .scroll-to-top {
+    bottom: 120px;   /* поднимаем над футером (55px футер + отступ) */
+}
+
+
+/* ============================ БУФЕРНАЯ СТРАНИЦА НОВОСТЕЙ */
+/* news buffer styles */
+
+.news-buffer-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    line-height: 1.7;
+}
+
+.news-header-meta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.source-name {
+    font-weight: 600;
+    color: #0066cc;
+    text-decoration: none;
+    font-size: 1.05rem;
+}
+
+.source-name:hover {
+    text-decoration: underline;
+}
+
+.news-date {
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.news-title {
+    font-size: 2.1rem;
+    line-height: 1.3;
+    margin: 15px 0 25px 0;
+    font-weight: 700;
+}
+
+.news-title a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.news-title a:hover {
+    text-decoration: underline;
+}
+
+.news-text {
+    font-size: 1.08rem;
+    color: #222;
+    margin-bottom: 40px;
+}
+
+.news-text p {
+    margin-bottom: 1.4em;
+}
+
+.news-text strong {
+    font-weight: 600;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .news-buffer-container {
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+    
+    .news-title {
+        font-size: 1.8rem;
+    }
+}
+
+
+
+.save-news-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9fa;
+    color: #0066cc;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: auto;           /* прижимает кнопку вправо */
+}
+
+.save-news-btn:hover {
+    background: #e9f0ff;
+    border-color: #0066cc;
+    color: #0052a3;
+}
+
+.save-icon {
+    font-size: 1.1rem;
+}
+
+.save-text {
+    font-weight: 500;
+}
+
+/* На маленьких экранах кнопка может переноситься */
+@media (max-width: 768px) {
+    .news-header-meta {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .save-news-btn {
+        margin-left: 0;
+    }
+}
+
+
+/*ИСТОРИЯ ПОИСКА РАЗБИТЬ ПО БЛОКАМ*/
+
+.search-wrapper.active .search-bar {
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.search-history {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+
+    background: rgba(255, 255, 255, 0.98);
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    box-sizing: border-box;
+
+    padding: 8px 0 12px 0;        /* уменьшил отступ сверху */
+    overflow: hidden;
+    z-index: 100;
+
+    animation: dropdownFade 0.35s ease;
+}
+
+/* Анимация */
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ====================== ЭЛЕМЕНТ ИСТОРИИ ====================== */
+.history-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    padding: 10px 16px;           /* главное исправление — отступы как у input */
+    min-height: 44px;             /* высота элемента ≈ высоте строки поиска */
+    
+    cursor: pointer;
+    font-size: 16px;              /* сделал такой же размер шрифта */
+}
+
+.history-item:hover {
+    background: rgba(30, 58, 138, 0.08);
+}
+
+/* Левая часть */
+.history-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+/* Иконка */
+.history-icon {
+    font-size: 16px;
+    opacity: 0.65;
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+/* Текст */
+.history-text {
+    font-size: 16px;
+    color: #1e3a8a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ====================== КРЕСТИК ====================== */
+.history-remove {
+    font-size: 18px;
+    color: #1e3a8a;               /* ← ЧЁРНЫЙ по умолчанию */
+    opacity: 0.7;
+    padding: 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.history-remove:hover {
+    opacity: 1;
+    color: #dc2626;               /* красный при наведении */
+    background: rgba(220, 38, 38, 0.1);
+}
+
+
+/* СОХРАНЕНИЕ НОВОСТИ В КОЛЛЕКЦИЮ */
+
+.save-news-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.save-news-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #f8f9ff;
+    color: #1e3a8a;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 0.96rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.save-news-btn:hover {
+    background: #e6f0ff;
+    border-color: #1e3a8a;
+}
+
+/* Выпадающая панель */
+.collections-dropdown {
+    display: none;
+    max-height: 400px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 6px;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 320px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.collections-dropdown.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #f8f9ff;
+}
+
+.dropdown-header strong {
+    color: #1e3a8a;
+}
+
+.dropdown-close {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #666;
+    cursor: pointer;
+}
+
+.collections-list {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    max-height: 320px;      
+    padding: 8px 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    padding-right: 4px;      
+}
+
+/* .collection-item {
+    padding: 10px 16px;
+} */
+
+.collection-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.collection-checkbox {
+    margin-top: 3px;
+    accent-color: #1e3a8a;
+}
+
+.collection-info {
+    flex: 1;
+}
+
+.collection-name {
+    font-weight: 600;
+    color: #222;
+}
+
+.collection-comment {
+    color: #555;
+    font-size: 0.9rem;
+    margin-top: 2px;
+}
+
+.collection-meta {
+    color: #777;
+    font-size: 0.85rem;
+    margin-top: 4px;
+}
+
+.dropdown-footer {
+    padding: 12px 16px;
+    border-top: 1px solid #eee;
+    display: flex;
+    gap: 10px;
+    background: #f8f9ff;
+}
+
+.btn-new-collection,
+.btn-save-selected {
+    flex: 1;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.btn-new-collection {
+    background: #f1f5f9;
+    color: #1e3a8a;
+    border: 1px solid #ddd;
+}
+
+.btn-save-selected {
+    background: #1e3a8a;
+    color: white;
+    border: none;
+}
+
+.btn-save-selected:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+}
+
+/* Скролл */
+.collections-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.collections-list::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 6px;
+}
+
+.collections-list::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+/*МОДАЛЬНОЕ ОКНО СОЗДАНИЯ НОВОЙ КОЛЛЕКЦИИ*/
+
+#new-collection-modal {
+    width: 420px;
+}
+
+.modal textarea {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+
+/* КНОПКА УДАЛЕНИЯ КОЛЛЕКЦИИ ПРИ ДОБАВЛЕНИИ НОВОСТИ В КОЛЛЕКЦИЮ */
+
+.collection-item {
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    flex: 0 0 auto;
+}
+
+.collection-item:hover {
+    background: #f5f5f5;
+}
+
+.collection-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* .collection-label {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    flex: 1;
+    cursor: pointer;
+} */
+
+.delete-collection-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    opacity: 0.5;
+    transition: opacity 0.2s, transform 0.1s;
+}
+
+.delete-collection-btn:hover {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.delete-collection-btn:active {
+    transform: scale(0.95);
+}
+
+.auth-hint {
+    padding: 12px 16px;
+}
+
+
+/* ==================== NEW BUFFER COMMENTS ==================== */
+
+.new_buffer_comments {
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.comments-title {
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    color: #333;
+}
+
+.comment-form {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 30px;
+    align-items: center;
+}
+
+.comment-input-wrapper {
+    flex: 1;
+    position: relative;
+}
+
+.comment-input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.comment-input:focus {
+    border-color: #0066cc;
+    box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.send-comment-btn {
+    padding: 14px 24px;
+    background: #0066cc;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: background 0.2s;
+}
+
+.send-comment-btn:hover {
+    background: #0052a3;
+}
+
+.send-comment-btn:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+/* Список комментариев */
+.comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.comment-item {
+    padding: 16px 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    border: 1px solid #eee;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.comment-user {
+    font-weight: 600;
+    color: #333;
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.comment-text {
+    margin-bottom: 12px;
+    line-height: 1.5;
+    color: #444;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.comment-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #666;
+    transition: color 0.2s;
+}
+
+.comment-action:hover {
+    color: #0066cc;
+}
+
+.comment-action.liked {
+    color: #e74c3c;
+}
+
+.comment-reply {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #0066cc;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.comment-reply:hover {
+    text-decoration: underline;
+}
+
+.new_buffer_load-more-btn{
+    width: 100%;
+    padding: 12px 20px;
+    margin-top: 20px;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    color: #0066cc;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.new_buffer_load-more-btn:hover {
+    background: #e0e0e0;
+    border-color: #0066cc;
+}

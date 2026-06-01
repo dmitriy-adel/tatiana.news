@@ -1,0 +1,98 @@
+{% extends 'main/base.html' %}
+{% block content %}
+
+<div class="tech-sup-page">  
+    <h1 class="page-title">Настройки профиля</h1>
+    <div class="support-container">
+        <div class="support-form">
+            <h2>Данные аккаунта</h2>
+            <div class="form-group">
+                <label for="settings-name">Имя пользователя</label>
+                <input type="text" id="settings-name" placeholder="Введите ваше имя">
+            </div>
+
+            <div class="form-group">
+                <label for="settings-email">Email адрес</label>
+                <input type="email" id="settings-email">
+            </div>
+
+            <div class="form-group">
+                <label for="settings-new-password">
+                    Новый пароль 
+                    <span style="font-weight: normal; color: #666; font-size: 14px;">(оставьте пустым, если не хотите менять)</span>
+                </label>
+                <input type="password" id="settings-new-password" placeholder="Новый пароль">
+            </div>
+
+            <div class="form-group">
+                <label for="settings-confirm-password">Повторите новый пароль</label>
+                <input type="password" id="settings-confirm-password" placeholder="Повторите новый пароль">
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 30px;">
+                <button id="btn-settings-cancel" 
+                    class="blue-btn" 
+                    style="background: #6c757d; flex: 1;" disabled>
+                    Отмена
+                </button>
+                <button id="btn-settings-save" class="blue-btn" style="flex: 1;" disabled>Сохранить изменения</button>
+            </div>
+        </div>
+
+        <div class="support-info">
+            <h2>Важная информация</h2>
+            <div class="info-card">
+                <h3>Безопасность</h3>
+                <p>После смены пароля вам будет предложено заново войти в аккаунт.</p>
+            </div>
+            
+            <div class="info-card">
+                <h3>Совет</h3>
+                <p>Используйте сложный пароль, состоящий минимум из 8 символов, включая буквы, цифры и специальные символы.</p>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения отмены -->
+<div id="settings-cancel-modal" class="modal hidden">
+    <span class="close-btn" id="cancel-modal-close">×</span>
+    
+    <h2>Отменить изменения?</h2>
+    <p>Все внесённые изменения будут потеряны.</p>
+
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="cancel-modal-no" class="blue-btn" style="background: #6c757d; flex: 1;">
+            Оставить
+        </button>
+        <button id="cancel-modal-yes" class="blue-btn" style="background: #dc3545; flex: 1;">
+            Отменить изменения
+        </button>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения текущего пароля -->
+<div id="settings-password-modal" class="modal hidden">
+    <span class="close-btn" id="modal-close">×</span>
+    
+    <h2>Подтверждение изменений</h2>
+    <p>Для сохранения изменений введите ваш текущий пароль:</p>
+    
+    <label for="modal-current-password">Текущий пароль</label>
+    <input type="password" id="modal-current-password" autocomplete="current-password">
+    
+    <div id="modal-error" style="color: red; margin: 10px 0; font-size: 14px;"></div>
+    
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+        <button id="modal-cancel-btn" class="blue-btn" style="background: #6c757d; flex: 1;">Отмена</button>
+        <button id="modal-confirm-btn" class="blue-btn" style="flex: 1;" >Подтвердить</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'main/js/user_settings.js' %}"></script>
+{% endblock %}

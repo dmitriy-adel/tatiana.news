@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script defer src="{% static 'main/js/user_agreement.js' %}"></script>
+    <title>Пользовательское соглашение • tatiana.news</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        * {
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        .toc-link {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .toc-link:hover {
+            color: #2563eb;
+            transform: translateX(6px);
+        }
+        
+        .toc-link.active {
+            color: #2563eb;
+            font-weight: 600;
+            background-color: #eff6ff;
+        }
+        
+        /* Увеличенный отступ для лучшего позиционирования заголовков */
+        .section-header {
+            scroll-margin-top: 180px;   /* Главное изменение здесь */
+        }
+        
+        .content-container::-webkit-scrollbar,
+        .toc-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .content-container::-webkit-scrollbar-thumb,
+        .toc-container::-webkit-scrollbar-thumb {
+            background-color: #d1d5db;
+            border-radius: 9999px;
+        }
+        
+        details summary {
+            list-style: none;
+        }
+        
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        .arrow {
+            transition: transform 0.3s ease;
+        }
+        
+        details[open] .arrow {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-zinc-50">
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- ЛЕВАЯ ПАНЕЛЬ -->
+        <div class="w-80 bg-white border-r border-zinc-200 flex flex-col h-full toc-container overflow-y-auto shadow-sm">
+            <div class="p-6 border-b border-zinc-200 bg-white sticky top-0 z-10">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-8 h-8 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-semibold text-xl">T</div>
+                    <div>
+                        <h1 class="font-semibold text-2xl tracking-tight">tatiana.news</h1>
+                        <p class="text-xs text-zinc-500">Пользовательское соглашение</p>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm font-medium text-zinc-400">СОДЕРЖАНИЕ</p>
+            </div>
+            
+            <div class="p-6 pt-4 flex-1">
+                <nav class="space-y-6">
+                    <details open>
+                        <summary class="flex items-center justify-between cursor-pointer py-2 px-3 rounded-xl hover:bg-zinc-100">
+                            <span class="font-semibold text-lg text-zinc-800">1. Общие положения</span>
+                            <span class="arrow text-zinc-400 text-xl leading-none">›</span>
+                        </summary>
+                        <div class="pl-6 mt-3 space-y-1 text-sm">
+                            <a href="#1-1" class="toc-link block py-2.5 px-4 rounded-xl">1.1. Основные термины и определения</a>
+                            <a href="#1-2" class="toc-link block py-2.5 px-4 rounded-xl">1.2. Предмет Соглашения</a>
+                            <a href="#1-3" class="toc-link block py-2.5 px-4 rounded-xl">1.3. Акцепт Соглашения</a>
+                            <a href="#1-4" class="toc-link block py-2.5 px-4 rounded-xl">1.4. Изменение Соглашения</a>
+                            <a href="#1-5" class="toc-link block py-2.5 px-4 rounded-xl">1.5. Применимое законодательство</a>
+                        </div>
+                    </details>
+                    
+                    <details open>
+                        <summary class="flex items-center justify-between cursor-pointer py-2 px-3 rounded-xl hover:bg-zinc-100">
+                            <span class="font-semibold text-lg text-zinc-800">2. Правила использования сервиса</span>
+                            <span class="arrow text-zinc-400 text-xl leading-none">›</span>
+                        </summary>
+                        <div class="pl-6 mt-3 space-y-1 text-sm">
+                            <a href="#2-1" class="toc-link block py-2.5 px-4 rounded-xl">2.1. Доступ к сервису</a>
+                            <a href="#2-2" class="toc-link block py-2.5 px-4 rounded-xl">2.2. Права пользователей</a>
+                            <a href="#2-3" class="toc-link block py-2.5 px-4 rounded-xl">2.3. Обязанности пользователей</a>
+                            <a href="#2-4" class="toc-link block py-2.5 px-4 rounded-xl">2.4. Запрещённые действия</a>
+                            <a href="#2-5" class="toc-link block py-2.5 px-4 rounded-xl">2.5. Интеллектуальная собственность</a>
+                            <a href="#2-6" class="toc-link block py-2.5 px-4 rounded-xl">2.6. Ограничение ответственности</a>
+                            <a href="#2-7" class="toc-link block py-2.5 px-4 rounded-xl">2.7. Прекращение использования</a>
+                        </div>
+                    </details>
+                </nav>
+            </div>
+            
+            <div class="p-6 text-xs text-zinc-400 border-t border-zinc-200 bg-white">
+                Сервис: <span class="font-mono text-blue-600">http://localhost:8001</span><br>
+                © 2026 tatiana.news
+            </div>
+        </div>
+        
+        <!-- ЦЕНТРАЛЬНАЯ ЧАСТЬ -->
+        <div id="content" class="flex-1 flex flex-col h-full content-container overflow-y-auto bg-white">
+            
+            <!-- Шапка -->
+            <div class="sticky top-0 bg-white border-b border-zinc-200 px-10 py-6 z-10">
+                <div class="max-w-3xl mx-auto">
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-x-3">
+                            <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center text-white text-2xl font-semibold">T</div>
+                            <h1 class="text-3xl font-semibold tracking-tight text-zinc-900">Пользовательское соглашение</h1>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-sm text-zinc-500">Последнее обновление: 26 марта 2026 года</p>
+                            <p class="text-xs text-zinc-400 mt-1">tatiana.news • localhost:8001</p>
+                        </div>
+                    </div>
+                    <p class="mt-4 text-zinc-500 text-sm max-w-2xl">
+                        Настоящее Пользовательское соглашение регулирует порядок использования агрегатора новостных статей tatiana.news.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="flex-1 px-10 py-8 max-w-3xl mx-auto prose prose-zinc leading-relaxed">
+                
+                <h2 id="1" class="section-header text-2xl font-semibold text-zinc-900 mt-8 mb-6">1. Общие положения</h2>
+                
+                <h3 id="1-1" class="section-header text-xl font-medium mt-10 mb-4">1.1. Основные термины и определения</h3>
+                <p class="mb-6">
+                    1.1.1. <strong>Сервис</strong> — агрегатор новостных статей под наименованием <strong>tatiana.news</strong>, 
+                    расположенный в сети Интернет по адресу <strong>http://localhost:8001</strong>.
+                </p>
+                <p class="mb-6">
+                    1.1.2. <strong>Пользователь</strong> — любое физическое или юридическое лицо, осуществляющее доступ к Сервису.
+                </p>
+                <p class="mb-6">
+                    1.1.3. <strong>Контент</strong> — новостные статьи, заголовки, описания, изображения и иные материалы, агрегируемые Сервисом.
+                </p>
+
+                <h3 id="1-2" class="section-header text-xl font-medium mt-10 mb-4">1.2. Предмет Соглашения</h3>
+                <p class="mb-6">
+                    Настоящее Соглашение определяет условия предоставления Пользователю права на использование сервиса tatiana.news как агрегатора новостных статей.
+                </p>
+
+                <h3 id="1-3" class="section-header text-xl font-medium mt-10 mb-4">1.3. Акцепт Соглашения</h3>
+                <p class="mb-6">
+                    Использование Сервиса любым способом означает полное и безоговорочное принятие условий настоящего Соглашения.
+                </p>
+
+                <h3 id="1-4" class="section-header text-xl font-medium mt-10 mb-4">1.4. Изменение Соглашения</h3>
+                <p class="mb-6">
+                    Администрация Сервиса вправе в любое время изменять условия Соглашения. Новая редакция вступает в силу с момента публикации на Сервисе. 
+                    Продолжение использования Сервиса после изменений означает согласие с новой редакцией.
+                </p>
+
+                <h3 id="1-5" class="section-header text-xl font-medium mt-10 mb-4">1.5. Применимое законодательство</h3>
+                <p class="mb-6">
+                    Настоящее Соглашение регулируется законодательством Российской Федерации.
+                </p>
+
+                <div class="h-px bg-zinc-200 my-12"></div>
+
+                <h2 id="2" class="section-header text-2xl font-semibold text-zinc-900 mt-8 mb-6">2. Правила использования сервиса</h2>
+                
+                <h3 id="2-1" class="section-header text-xl font-medium mt-10 mb-4">2.1. Доступ к сервису</h3>
+                <p class="mb-6">
+                    Доступ к Сервису предоставляется бесплатно и без обязательной регистрации.
+                </p>
+
+                <h3 id="2-2" class="section-header text-xl font-medium mt-10 mb-4">2.2. Права пользователей</h3>
+                <ul class="list-disc pl-6 mb-6 space-y-2">
+                    <li>Просматривать агрегированный контент и переходить по ссылкам на первоисточники</li>
+                    <li>Использовать поиск по новостям</li>
+                    <li>Сохранять ссылки на статьи для личного использования</li>
+                </ul>
+
+                <h3 id="2-3" class="section-header text-xl font-medium mt-10 mb-4">2.3. Обязанности пользователей</h3>
+                <ul class="list-disc pl-6 mb-6 space-y-2">
+                    <li>Соблюдать условия настоящего Соглашения и законодательство РФ</li>
+                    <li>Не нарушать работу Сервиса</li>
+                    <li>Уважать права интеллектуальной собственности</li>
+                </ul>
+
+                <h3 id="2-4" class="section-header text-xl font-medium mt-10 mb-4">2.4. Запрещённые действия</h3>
+                <p class="mb-4">Пользователю запрещается:</p>
+                <ul class="list-disc pl-6 mb-6 space-y-2">
+                    <li>Использовать Сервис в коммерческих целях без разрешения</li>
+                    <li>Копировать Контент в больших объёмах</li>
+                    <li>Пытаться обходить технические средства защиты</li>
+                    <li>Создавать чрезмерную нагрузку на Сервис</li>
+                </ul>
+
+                <h3 id="2-5" class="section-header text-xl font-medium mt-10 mb-4">2.5. Интеллектуальная собственность</h3>
+                <p class="mb-6">
+                    Все права на Контент принадлежат соответствующим правообладателям. Сервис tatiana.news только агрегирует и предоставляет ссылки на открытые источники. 
+                    Пользователь не получает никаких прав на интеллектуальную собственность Контента, кроме права просмотра.
+                </p>
+
+                <h3 id="2-6" class="section-header text-xl font-medium mt-10 mb-4">2.6. Ограничение ответственности</h3>
+                <p class="mb-6">
+                    Сервис предоставляется «как есть». Администрация не гарантирует бесперебойную работу Сервиса и не несёт ответственности за достоверность, полноту и актуальность агрегируемых новостей.
+                </p>
+                <p class="mb-6">
+                    Администрация не несёт ответственности за содержание внешних ресурсов, на которые ведут ссылки с Сервиса.
+                </p>
+
+                <h3 id="2-7" class="section-header text-xl font-medium mt-10 mb-4">2.7. Прекращение использования</h3>
+                <p class="mb-6">
+                    Пользователь вправе в любое время прекратить использование Сервиса. 
+                    Администрация вправе ограничить или прекратить доступ к Сервису в случае нарушения условий Соглашения.
+                </p>
+
+                <div class="mt-20 pt-10 border-t border-zinc-200 text-center text-sm text-zinc-500">
+                    Использование сервиса <strong>tatiana.news</strong>[](http://localhost:8001) означает согласие с условиями настоящего Пользовательского соглашения.
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

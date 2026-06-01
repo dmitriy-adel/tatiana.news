@@ -1,0 +1,122 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<div class="news-buffer-container">
+
+    <div class="news-header-meta">
+        <a href="{{ source_main_url|default:'#' }}" 
+           class="source-name" target="_blank" rel="noopener">
+            {{ source_name|default:'Неизвестный источник' }}
+        </a>
+        
+        <!-- Кнопка "Сохранить" -->
+        <div class="save-news-wrapper">
+            <button type="button" class="save-news-btn" id="save-news-button">
+                <span class="save-icon">📁</span>
+                <span class="save-text">Сохранить</span>
+            </button>
+
+            <!-- Выпадающая панель с коллекциями -->
+            <div class="collections-dropdown" id="collections-dropdown">
+                <div class="dropdown-header">
+                    <strong>Сохранить в коллекцию</strong>
+                    <button type="button" class="dropdown-close" id="dropdown-close">✕</button>
+                </div>
+                
+                <div class="collections-list" id="collections-list">
+                    <!-- Заполняется через JavaScript -->
+                </div>
+
+                <div class="dropdown-footer">
+                    <button type="button" class="btn-new-collection" id="new-collection-btn">
+                        + Новая коллекция
+                    </button>
+                    <button type="button" class="btn-save-selected" id="save-selected-btn" disabled>
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <span class="news-date">
+            {{ created_at|date:"d MMMM yyyy, HH:mm" }}
+        </span>
+    </div>
+
+    <h1 class="news-title">
+        <a href="{{ url }}" target="_blank" rel="noopener">
+            {{ title }}
+        </a>
+    </h1>
+
+    <div class="news-text">
+        {{ text|linebreaks }}
+    </div>
+
+    <div class="related-news-placeholder">
+        <!-- Здесь позже похожие новости -->
+    </div>
+
+    <div class="comments-section new_buffer_comments">
+    <h3 class="comments-title">Комментарии</h3>
+    
+    <!-- Форма добавления комментария -->
+    <div class="comment-form">
+        <div class="comment-input-wrapper">
+            <input 
+                type="text" 
+                id="new-comment-input" 
+                class="comment-input" 
+                placeholder="Ваш комментарий..."
+            >
+        </div>
+        <button id="send-comment-btn" class="send-comment-btn">Отправить</button>
+    </div>
+
+    <!-- Список комментариев -->
+    <div id="comments-list" class="comments-list">
+        <!-- Заполняется через JS -->
+    </div>
+</div>
+
+</div>
+
+
+<div id="create-collection-modal" class="modal hidden">
+    <span class="close-btn" id="create-modal-close">×</span>
+    
+    <h2>Укажите параметры новой коллекции новостей</h2>
+
+    <label for="collection-name">Наименование</label>
+    <input type="text" id="collection-name" placeholder="Введите название" autocomplete="off">
+
+    <label for="collection-description">Описание</label>
+    <input type="text" id="collection-description" placeholder="Введите описание" autocomplete="off">
+
+    <div id="create-collection-error" style="color: red; font-size: 14px;"></div>
+
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button id="create-collection-cancel" class="blue-btn" style="background: #6c757d; flex: 1;">
+            Отмена
+        </button>
+        <button id="create-collection-confirm" class="blue-btn" style="flex: 1;">
+            Сохранить
+        </button>
+    </div>
+</div>
+
+
+<script>
+    // Инициализация функционала страницы буфера новости
+    document.addEventListener('DOMContentLoaded', function() {
+        initNewsBufferPage();
+    });
+</script>
+
+
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<script src="{% static 'main/js/news_buffer.js' %}"></script>
+{% endblock %}
