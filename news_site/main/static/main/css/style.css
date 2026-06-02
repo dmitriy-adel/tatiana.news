@@ -634,7 +634,7 @@ body {
 
 /* ==================== КАТЕГОРИИ НОВОСТЕЙ НА ГЛАВНОЙ СТРАНИЦЕ ==================== */
 
-.category-bar {
+/* .category-bar {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -642,9 +642,21 @@ body {
     margin-bottom: 30px;
     width: 100%;
     overflow: hidden;
+} */
+
+.category-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 0;
+    margin-bottom: 30px;
+    width: 100%;
+    overflow: visible;
+
+    position: relative;
 }
 
-.categories-container {
+/* .categories-container {
     display: flex;
     gap: 12px;
     overflow-x: auto;
@@ -656,13 +668,48 @@ body {
     -ms-overflow-style: none;
     flex-wrap: nowrap;           
     scroll-snap-type: x mandatory;
+} */
+
+/* .categories-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    flex: 1 1 auto;
+    padding: 6px 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap;
+    scroll-snap-type: x mandatory;
+
+    justify-content: center;
+} */
+
+.categories-container {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    flex: 1 1 auto;
+    padding: 6px 40px 6px 50px;   
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex-wrap: nowrap;
+    scroll-snap-type: x mandatory;
+    justify-content: center;
 }
+
+/* .categories-container::-webkit-scrollbar {
+    display: none;
+} */
 
 .categories-container::-webkit-scrollbar {
     display: none;
 }
 
-.category-pill {
+/* .category-pill {
     position: flex;
     background: #fff;
     color: #333;
@@ -687,14 +734,69 @@ body {
     justify-content: center;
     text-align: center;
     scroll-snap-align: start;
+} */
+
+.category-pill {
+    flex: 0 0 160px;
+    width: 160px;
+    background: #fff;
+    color: #333;
+    padding: 12px 18px;
+    border-radius: 14px; 
+    font-size: 14px;
+    font-weight: 200;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #e8e8e8;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
+
+/* .category-pill:hover {
+    background: #007bff;
+    color: white;
+} */
 
 .category-pill:hover {
     background: #007bff;
     color: white;
 }
 
-.scroll-btn {
+@media (max-width: 1200px) {
+    .category-pill {
+        flex: 0 0 145px;
+        width: 145px;
+        padding: 11px 16px;
+        font-size: 13.5px;
+    }
+}
+
+@media (max-width: 768px) {
+    .category-pill {
+        flex: 0 0 120px;
+        width: 120px;
+        padding: 9px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .category-pill {
+        flex: 0 0 100px;
+        width: 100px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+/* .scroll-btn {
     width: 44px;
     height: 44px;
     border: none;
@@ -708,15 +810,49 @@ body {
     justify-content: center;
     cursor: pointer;
     flex-shrink: 0;
+} */
+
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #444;
+    font-size: 24px;
+    border-radius: 50%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.2s ease;
+}
+
+.scroll-btn.left {
+    left: 8px;                    /* чуть левее контента */
+}
+
+.scroll-btn.right {
+    right: 20px;                  /* чуть левее правого края окна/контента */
 }
 
 .scroll-btn.visible {
     display: flex;
 }
 
+/* .scroll-btn:hover {
+    background: #007bff;
+    color: white;
+} */
+
 .scroll-btn:hover {
     background: #007bff;
     color: white;
+    transform: translateY(-50%) scale(1.05);
 }
 
 .loading-text {
@@ -784,10 +920,150 @@ body {
 
 /* !!==================== АУТЕНТИФИКАЦИЯ  ?? ====================!! */
 
+#newsFeed {
+    width: 100%;
+    max-width: 100%;           /* теперь занимает всю доступную ширину .content */
+    margin: 0;                 /* убираем центрирование */
+    padding-left: 20px;        /* ← небольшой отступ от сайдбара (можно 15px или 25px) */
+    padding-right: 20px;
+    padding-top: 10px;
+    box-sizing: border-box;
+}
 
-/* НОВОЕ */
-
+/* === Секция новостей === */
 .news-section {
+    margin-bottom: 30px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;       /* на всякий случай */
+}
+
+.section-title {
+    font-size: 1.4rem;      /* было 1.8rem */
+    margin: 15px 0 10px 0;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 6px;
+}
+
+/* === Сетка (2 большие + список) === */
+/* .news-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;           
+} */
+
+.news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.left-column,
+.right-column {
+    min-width: 0;           /* ← позволяет карточкам сжиматься */
+    width: 100%;
+}
+
+/* === Большая карточка === */
+.news-card.big {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;           /* ← главное правило для сжатия */
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.news-card.big:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+/* === Маленький элемент списка === */
+.news-item.small {
+    padding: 6px 0;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    max-width: 100%;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.news-item.small:last-child {
+    border-bottom: none;
+}
+
+/* === Заголовки и текст (самое важное для переноса) === */
+.news-title {
+    margin: 0 0 6px 0;
+    line-height: 1.3;
+    font-size: 1.1rem;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;           /* на всякий случай */
+}
+
+.news-card.big .news-title {
+    font-size: 1.15rem;     /* чуть крупнее для больших карточек */
+}
+
+.news-item.small .news-title {
+    font-size: 1rem;
+}
+
+.news-text {
+    color: #555;
+    font-size: 0.82rem;
+    line-height: 1.35;
+    margin: 0 0 4px 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+}
+
+.news-meta {
+    font-size: 0.72rem;     /* было 0.85rem */
+    color: #888;
+    margin-top: 6px;
+}
+
+/* === Адаптивность (очень рекомендуется) === */
+@media (max-width: 1100px){
+    .news-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .left-column {
+        margin-bottom: 10px;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+    }
+    
+    .news-card.big {
+        padding: 10px;
+    }
+}
+
+/* .news-section {
     margin-bottom: 40px;
 }
 
@@ -842,7 +1118,7 @@ body {
     font-size: 0.85rem;
     color: #888;
     margin-top: 10px;
-}
+} */
 
 /* ====================== КНОПКА "НАВЕРХ" ====================== */
 .scroll-to-top {
