@@ -238,7 +238,6 @@ function initCreateCollectionModal() {
     });
 }
 
-
 async function loadUserCollections() {
     const listContainer = document.getElementById('collections-list');
 

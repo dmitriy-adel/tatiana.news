@@ -20,6 +20,9 @@ let initialCollections = new Set();
 
 let currentSetupEmail = null;  // для генерации кода аутентификации
 
+let allNewsClasses = [];          // для категорий на главной странице
+let currentCategoryIndex = 0;
+let itemsPerPage = 6;
 
 // !!==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================!!
 

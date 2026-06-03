@@ -11,11 +11,9 @@ async function loadUserCollections() {
                 <button onclick="openLoginModal(event)" class="blue-btn">Войти</button>
             </div>
         `;
-        console.warn('какой-то...');
         showToast('Требуется авторизация', 2500, 'red');
     }
 
-    // === Дальше идёт загрузка коллекций (твой код) ===
     try {
         const response = await fetch('http://127.0.0.1:8001/get_user_news_collections', {
             method: 'GET',
@@ -36,30 +34,6 @@ async function loadUserCollections() {
             `;
             return;
         }
-
-        // let html = '<div class="collections-grid">';
-
-        // collections.forEach(coll => {
-        //     html += `
-        //         <div class="collection-card">
-        //             <div class="collection-header">
-        //                 <h3 onclick="openCollection(${coll.collection_id}, '${escapeHtml(coll.collection_name)}')">
-        //                     ${escapeHtml(coll.collection_name)}
-        //                 </h3>
-        //                 <div class="settings-btn" onclick="showCollectionMenu(event, ${coll.collection_id}, '${escapeHtml(coll.collection_name)}', '${escapeHtml(coll.collection_comment || '')}')">
-        //                     ⚙️
-        //                 </div>
-        //             </div>
-                    
-        //             ${coll.collection_comment ? `<p class="comment">${escapeHtml(coll.collection_comment)}</p>` : ''}
-                    
-        //             <div class="collection-meta">
-        //                 <span class="news-count">${coll.collection_total_news} новостей</span>
-        //                 <span class="updated">Обновлено: ${coll.collection_last_updated_at}</span>
-        //             </div>
-        //         </div>
-        //     `;
-        // });
 
         let html = '<div class="collections-grid">';
 
@@ -96,7 +70,7 @@ async function loadUserCollections() {
 }
 
 function showCollectionMenu(e, collectionId, name, comment) {
-    e.stopImmediatePropagation(); // чтобы не открывалась коллекция при клике на шестерёнку
+    e.stopImmediatePropagation(); 
     document.querySelectorAll('.collection-menu').forEach(m => m.remove());
 
     const menu = document.createElement('div');
@@ -113,14 +87,12 @@ function showCollectionMenu(e, collectionId, name, comment) {
         <div class="menu-item" style="color: #d32f2f;" onclick="deleteCollection(${collectionId})">Удалить</div>
     `;
 
-    // Позиционируем меню рядом с кнопкой
     const rect = e.currentTarget.getBoundingClientRect();
     menu.style.top = `${rect.bottom + window.scrollY + 5}px`;
     menu.style.left = `${rect.left + window.scrollX - 100}px`;
 
     document.body.appendChild(menu);
 
-    // Закрытие меню при клике вне его
     setTimeout(() => {
         document.addEventListener('click', function handler(ev) {
             if (!menu.contains(ev.target)) {
@@ -170,7 +142,7 @@ async function saveCollectionChanges() {
 
         closeEditModal();
         showToast('Коллекция успешно обновлена');
-        loadUserCollections(); // перезагружаем список
+        loadUserCollections(); 
 
     } catch (err) {
         console.error(err);
@@ -182,6 +154,8 @@ async function deleteCollection(collectionId) {
     if (!confirm('Вы действительно хотите удалить эту коллекцию?')) {
         return;
     }
+
+    document.querySelectorAll('.collection-menu').forEach(m => m.remove());
 
     try {
         const response = await fetch('http://127.0.0.1:8001/remove_news_collection', {
@@ -197,7 +171,6 @@ async function deleteCollection(collectionId) {
         showToast('Коллекция удалена');
         loadUserCollections();
 
-        // Если удаляем открытую коллекцию — закрываем панель
         if (selectedCollectionId === collectionId) {
             document.getElementById('collection-detail').classList.add('hidden');
         }
@@ -225,62 +198,11 @@ function formatNewsDate(dateStr) {
         day: 'numeric',
         month: 'long',      
         year: 'numeric',
-        // hour: '2-digit',
-        // minute: '2-digit',
         hour12: false
     }).format(date);
 }
 
-// async function openCollection(collectionId, collectionName) {
-//     selectedCollectionId = collectionId;
-    
-//     document.getElementById('collection-detail').classList.remove('hidden');
-//     // document.getElementById('detail-collection-name').textContent = collectionName;
-//     document.getElementById('detail-collection-name').textContent = `Имя коллекции: ${collectionName}`;
-
-//     const newsContainer = document.getElementById('news-list');
-//     newsContainer.innerHTML = '<div class="loading">Загрузка новостей...</div>';
-
-//     try {
-//         const response = await fetch('http://127.0.0.1:8001/get_collection_news', {
-//             method: 'POST',
-//             credentials: 'include',
-//             headers: { 'Content-Type': 'application/json' },
-//             body: JSON.stringify({ collection_id: collectionId }),
-//             signal: AbortSignal.timeout(15000)
-//         });
-
-//         if (!response.ok) throw new Error('Ошибка загрузки новостей');
-
-//         const news = await response.json();
-
-//         if (news.length === 0) {
-//             newsContainer.innerHTML = '<p class="empty">В коллекции пока нет новостей.</p>';
-//             return;
-//         }
-
-//         let html = '';
-//         news.forEach(item => {
-//             const formattedDate = formatNewsDate(item.news_created_at);
-//             html += `
-//                 <div class="news-item" onclick="openNews(${item.news_id})">
-//                     <h4>${escapeHtml(item.news_title)}</h4>
-//                     <p class="news-source">${escapeHtml(item.news_source_name)} • ${formattedDate}</p>
-//                     ${item.news_text ? `<p class="news-preview">${escapeHtml(item.news_text.substring(0, 150))}...</p>` : ''}
-//                 </div>
-//             `;
-//         });
-
-//         newsContainer.innerHTML = html;
-
-//     } catch (error) {
-//         console.error(error);
-//         newsContainer.innerHTML = '<p class="error">Не удалось загрузить новости коллекции.</p>';
-//     }
-// }
 async function openCollection(collectionId, collectionName) {
-    console.log('🔥 openCollection ВЫЗВАНА!', { collectionId, collectionName }); // ← добавили для диагностики
-
     selectedCollectionId = collectionId;
     
     const panel = document.getElementById('collection-detail');
@@ -333,28 +255,124 @@ function openNews(newsId) {
     window.location.href = `http://127.0.0.1:8000/news/${newsId}/`;
 }
 
-// function closeDetailPanel() {
-//     document.getElementById('collection-detail').classList.add('hidden');
-// }
-
 function closeDetailPanel() {
     const panel = document.getElementById('collection-detail');
-    panel.style.display = 'none';                    // ← только это изменили
+    panel.style.display = 'none';                    
 }
 
-// Защита от XSS
 function escapeHtml(unsafe) {
     if (!unsafe) return '';
     return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
                  .replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
-// Создание новой коллекции (заглушка — можешь доработать)
 function createNewCollection() {
-    alert('Функция создания коллекции будет добавлена позже');
-    // Здесь можно открыть модальное окно создания
+    const modal = document.getElementById('create-collection-modal');
+    if (!modal) {
+        console.error('Модальное окно не найдено');
+        return;
+    }
+
+    const nameInput = document.getElementById('collection-name');
+    const descInput = document.getElementById('collection-description');
+    const errorBlock = document.getElementById('create-collection-error');
+    const confirmBtn = document.getElementById('create-collection-confirm');
+
+    nameInput.value = '';
+    descInput.value = '';
+    errorBlock.textContent = '';
+    nameInput.classList.remove('error');
+
+    modal.classList.remove('hidden');
+
+    setTimeout(() => nameInput.focus(), 100);
+}
+
+function initCreateCollectionModal() {
+    const modal = document.getElementById('create-collection-modal');
+    if (!modal) return;
+
+    const closeBtn = document.getElementById('create-modal-close');
+    const cancelBtn = document.getElementById('create-collection-cancel');
+    const confirmBtn = document.getElementById('create-collection-confirm');
+    const nameInput = document.getElementById('collection-name');
+    const descInput = document.getElementById('collection-description');
+    const errorBlock = document.getElementById('create-collection-error');
+
+    const closeModal = () => {
+        modal.classList.add('hidden');
+        errorBlock.textContent = '';
+        nameInput.classList.remove('error');
+    };
+
+    closeBtn.addEventListener('click', closeModal);
+    cancelBtn.addEventListener('click', closeModal);
+
+    const updateConfirmState = () => {
+        const hasName = nameInput.value.trim().length > 0;
+        confirmBtn.disabled = !hasName;
+
+        if (hasName) {
+            confirmBtn.style.background = '#007bff';
+            confirmBtn.style.color = 'white';
+        } else {
+            confirmBtn.style.background = '#ccc';
+            confirmBtn.style.color = '#888';
+        }
+    };
+
+    nameInput.addEventListener('input', updateConfirmState);
+
+    confirmBtn.addEventListener('click', async () => {
+        const name = nameInput.value.trim();
+        const description = descInput.value.trim();
+
+        if (!name) {
+            errorBlock.textContent = 'Введите название коллекции';
+            nameInput.classList.add('error');
+            return;
+        }
+
+        nameInput.classList.remove('error');
+        confirmBtn.disabled = true;
+
+        const payload = {
+            news_collection_name: name,
+            news_collection_description: description || ""
+        };
+
+        try {
+            const response = await fetch('http://127.0.0.1:8001/create_news_collection', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+                signal: AbortSignal.timeout(15000)
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка сервера');
+            }
+
+            closeModal();
+            showToast('Коллекция успешно создана!', 2500, 'green');
+            
+            if (typeof loadUserCollections === 'function') {
+                loadUserCollections();
+            }
+
+        } catch (err) {
+            console.error(err);
+            showToast('Не удалось создать коллекцию', 2500, 'red');
+            errorBlock.textContent = 'Ошибка при создании коллекции';
+            confirmBtn.disabled = false;
+        }
+    });
+
+    updateConfirmState();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadUserCollections();
+    initCreateCollectionModal();
 });
