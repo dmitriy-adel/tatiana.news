@@ -7,10 +7,10 @@
     <h1 class="page-title">Мои коллекции новостей</h1>
 
     <div id="collections-container">
-        <!-- JS заполнит сюда карточки коллекций -->
+
     </div>
 
-    <!-- Правая панель с новостями -->
+    <!-- правая панель с новостями -->
     <div id="collection-detail" class="collection-detail" style="display: none;">
         <div class="detail-header">
             <button onclick="closeDetailPanel()" class="back-btn">← Назад</button>
@@ -21,7 +21,6 @@
 
 </div>
 
-<!-- Модальное окно редактирования коллекции -->
 <div id="edit-collection-modal" class="modal hidden">
     <span class="close-btn" onclick="closeEditModal()">×</span>
     
@@ -36,8 +35,33 @@
     <div id="edit-collection-error" class="error-message"></div>
 
     <div class="modal-buttons">
-        <button onclick="closeEditModal()" class="gray-btn">Отмена</button>
+        <button onclick="closeEditModal()" class="red-btn">Отмена</button>
         <button onclick="saveCollectionChanges()" class="blue-btn">Сохранить</button>
+    </div>
+</div>
+
+
+<!-- Модальное окно создания коллекции -->
+<div id="create-collection-modal" class="modal hidden">
+    <span class="close-btn" id="create-modal-close">×</span>
+    
+    <h2>Укажите параметры новой коллекции новостей</h2>
+
+    <label for="collection-name">Наименование <span style="color: #dc3545;">*</span></label>
+    <input type="text" id="collection-name" placeholder="Введите название коллекции" autocomplete="off">
+
+    <label for="collection-description">Описание</label>
+    <input type="text" id="collection-description" placeholder="Краткое описание (необязательно)" autocomplete="off">
+
+    <div id="create-collection-error" style="color: #dc3545; font-size: 14px; min-height: 18px;"></div>
+
+    <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <button id="create-collection-cancel" class="red-btn cancel-btn" style="flex: 1;">
+            Отмена
+        </button>
+        <button id="create-collection-confirm" class="blue-btn confirm-btn" disabled style="flex: 1;">
+            Создать коллекцию
+        </button>
     </div>
 </div>
 
