@@ -463,14 +463,17 @@ def remove_news_collection(request: RemoveNewsCollectionRequest, user_id: int = 
 def get_collection_news(request: GetCollectionNewsRequest):
     try:
         news_ids: list[int] = dbc.get_collection_news_ids(collection_id=request.collection_id)
-        news_info: list[dict] = dbc.get_some_news_info(news_ids=news_ids)
+        if len(news_ids) > 0:
+            news_info: list[dict] = dbc.get_some_news_info(news_ids=news_ids)
 
-        source_info: dict = dbc.get_all_sources()
-        for t in range(len(news_info)):
-            news_info[t]['news_source_name'] = source_info[news_info[t]['source_id']]['name']
-            del news_info[t]['source_id']
+            source_info: dict = dbc.get_all_sources()
+            for t in range(len(news_info)):
+                news_info[t]['news_source_name'] = source_info[news_info[t]['source_id']]['name']
+                del news_info[t]['source_id']
 
-        return news_info
+            return news_info
+        
+        return {"length": 0}
     
     except Exception as _ex:
         print(f"[app.py->remove_news_collection]. Error :: {_ex}")
