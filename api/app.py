@@ -1,5 +1,4 @@
 import os
-import secrets
 from datetime import datetime
 from fastapi import FastAPI, HTTPException, status, Depends, Response, Request
 from fastapi.responses import JSONResponse
@@ -19,11 +18,15 @@ from schemas import (SearchNewsRequest, CreateCollectionRequest, UpdateCollectio
                     VerificationEmailRequest, GetNewsInfoRequest, ChangeCollectionsFillRequest, LikeDislikeRequest,
                     Complete2FARegistration)
 
-from redis_logic import lifespan
+from redis_client import RedisClient
 import pyotp
 
+rc: RedisClient = RedisClient()
+dbc: DBConnection = DBConnection()
+tls: Tools = Tools()
+se: SearchEngine = SearchEngine()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=rc.lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -38,10 +41,6 @@ app.add_middleware(
     expose_headers=["*"]
 )
 
-dbc: DBConnection = DBConnection()
-tls: Tools = Tools()
-se: SearchEngine = SearchEngine()
-
 private_vars = os.environ
 BASE_ROLE: str = private_vars["BASE_ROLE"]
 
@@ -55,130 +54,18 @@ def get_redis(request: Request):
     
     return request.app.state.redis
 
-async def create_session(user_id: int, redis_client) -> str:
-    session_id: str = secrets.token_urlsafe(32)
-    key: str = f"session:{session_id}"
-
-    session_data = {
-        "user_id": str(user_id),
-        "created_at": datetime.utcnow().isoformat(),
-        "last_activity": datetime.utcnow().isoformat(),
-    }
-
-    for field, value in session_data.items():
-        await redis_client.hset(key, field, value)
-
-    await redis_client.expire(key, 60 * 24 * 7)
-
-    # print(f"Create session: {session_id[:8]}... for user {user_id}")
-    return session_id
-
-async def get_session(session_id: str, redis_client):
-    if not session_id:
-        return None
-    
-    key = f"session:{session_id}"
-    data = await redis_client.hgetall(key)
-    
-    if not data or "user_id" not in data:
-        return None
-
-    await redis_client.expire(key, 60 * 24 * 7)
-    
-    return int(data["user_id"])
-
-async def delete_session(session_id: str, redis_client):
-    SESSION_PREFIX: str = "session:"
-    if session_id:
-        await redis_client.delete(f"{SESSION_PREFIX}{session_id}")
 
 async def get_current_user_id_from_redis(request: Request, redis_client = Depends(get_redis)):
     session_id = request.cookies.get("session_id")
     if not session_id:
         raise HTTPException(status_code=401, detail="Not autorizedd")
 
-    user_id = await get_session(session_id, redis_client)
+    user_id = await rc.get_session(session_id, redis_client)
     if user_id is None:
         raise HTTPException(status_code=401, detail="Session expired")
 
     return user_id
 
-# --------------------------------------------------
-#               redis logic verification codes
-# --------------------------------------------------
-
-async def create_email_verification_code(email: str, code: str, redis_client) -> str:
-    """
-    Создаёт и сохраняет код подтверждения email в Redis
-    Возвращает сгенерированный код
-    """ 
-    
-    key = f"email_verification:{email}"
-    
-    verification_data = {
-        "code": code,
-        "attempts": "0",
-        "created_at": datetime.utcnow().isoformat(),
-    }
-
-    for field, value in verification_data.items():
-        await redis_client.hset(key, field, value)
-
-    await redis_client.expire(key, 60 * 10)
-
-    print(f"Код подтверждения создан для {email}: {code}")
-    return code
-
-async def get_email_verification_code(email: str, redis_client):
-    """
-    Получает данные кода подтверждения по email
-    Возвращает dict или None, если код не найден или истёк
-    """
-    key = f"email_verification:{email}"
-    data = await redis_client.hgetall(key)
-    
-    if not data:
-        return None
-    
-    print('data items', data.items())
-    return {k: v for k, v in data.items()}
-
-async def delete_email_verification_code(email: str, redis_client):
-    """Удаляет код подтверждения после успешной верификации"""
-    key = f"email_verification:{email}"
-    await redis_client.delete(key)
-
-async def increment_verification_attempts(email: str, redis_client) -> int:
-    """
-    Увеличивает счётчик попыток ввода кода
-    Возвращает текущее количество попыток
-    """
-    key = f"email_verification:{email}"
-    attempts = await redis_client.hincrby(key, "attempts", 1)
-    return attempts
-
-async def verify_email_code(email: str, input_code: str, redis_client):
-    data = await get_email_verification_code(email, redis_client)
-    
-    if not data:
-        raise HTTPException(status_code=400, detail="Код истёк или не найден")
-    
-    attempts = int(data.get("attempts", 0))
-    if attempts >= 5:
-        raise HTTPException(status_code=429, detail="Слишком много попыток. Попробуйте позже.")
-    
-    if data.get("code") != input_code:
-        await increment_verification_attempts(email, redis_client)
-        raise HTTPException(status_code=400, detail="Неверный код")
-    
-    print("код подошел")
-    await delete_email_verification_code(email, redis_client)
-    return True
-
-async def can_send_new_code(email: str, redis_client) -> bool:
-    key = f"email_verification:{email}"
-    exists = await redis_client.exists(key)
-    return not bool(exists)
 
 # --------------------------------------------------
 #               sup logic
@@ -227,40 +114,6 @@ async def get_news_classes():
     
     except Exception as _ex:
         print(f"[app.py->get_news_classes]. Error :: {_ex}")
-        raise HTTPException(status_code=500, detail="Server error")
-
-@app.post("/remove_news")
-def remove_news(request: RemoveNewsRequest):
-    try:
-        last_news = dbc.remove_news(news_id=request.news_id)
-        # result = dbc.get_news(
-        #     user_id=request.user_id,
-        #     search_string=request.search_string,
-        #     filters=request.filters,
-        #     current_news_max_pos=request.current_news_max_pos
-        # )
-        return last_news
-    
-    except Exception as _ex:
-        print(f"[app.py->remove_news]. Error :: {_ex}")
-        raise HTTPException(status_code=500, detail="Server error")
-    
-@app.post("/update_news")
-def update_news(request: UpdateNewsRequest):
-    try:
-        last_news = dbc.update_news(news_id=request.news_id, title=request.title, text=request.text, 
-                                    url=request.url, class_id=request.class_id, source_id=request.source_id, 
-                                    tags=request.tags, keywords=request.keywords)
-        # result = dbc.get_news(
-        #     user_id=request.user_id,
-        #     search_string=request.search_string,
-        #     filters=request.filters,
-        #     current_news_max_pos=request.current_news_max_pos
-        # )
-        return last_news
-    
-    except Exception as _ex:
-        print(f"[app.py->update_news]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
 
 @app.post("/search_news")
@@ -362,32 +215,12 @@ def add_comment_dislike(request: LikeDislikeRequest) -> dict:
     except Exception as _ex:
         print(f"[app.py->add_comment_dislike]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
-    
-# @app.post("/remove_comment_like")
-# def remove_comment_like(request: LikeDislikeRequest) -> dict:
-#     try:
-#         dbc.remove_like()
-#         return {"status": True}
-
-#     except Exception as _ex:
-#         print(f"[app.py->]. Error :: {_ex}")
-#         raise HTTPException(status_code=500, detail="Server error")
-    
-# @app.post("/remove_comment_dislike")
-# def remove_comment_dislike(request: LikeDislikeRequest) -> dict:
-#     try:
-#         dbc.remove_dislike()
-#         return {"status": True}
-
-#     except Exception as _ex:
-#         print(f"[app.py->]. Error :: {_ex}")
-#         raise HTTPException(status_code=500, detail="Server error")
 
 # --------------------------------------------------
 #               new_collections logic
 # --------------------------------------------------
 
-@app.post("/create_news_collection")  # - корректно
+@app.post("/create_news_collection")
 def create_news_collection(request: CreateCollectionRequest, user_id: int = Depends(get_current_user_id_from_redis)):
     try:
         result = dbc.create_news_collection(
@@ -498,7 +331,7 @@ def get_collection_news(request: GetCollectionNewsRequest):
 #             )
 #             user_id: int = dbc.get_user_id_by_email(user_email=request.user_email)['id']
 #             dbc.create_first_collection(user_id=user_id, last_update_date=datetime.now())
-#             await delete_email_verification_code(email=request.user_email, redis_client=redis_client)
+#             await delete_email_vercode(email=request.user_email, redis_client=redis_client)
 #             return {"status": True}
         
 #         return {"status": False}
@@ -511,7 +344,7 @@ def get_collection_news(request: GetCollectionNewsRequest):
 async def add_user(request: AddUserRequest, redis_client = Depends(get_redis)):
     try:
         email = request.user_email.strip().lower()
-        if not await verify_email_code(
+        if not await rc.verify_email_code(
             email=email, 
             input_code=request.verification_code, 
             redis_client=redis_client
@@ -535,7 +368,7 @@ async def add_user(request: AddUserRequest, redis_client = Depends(get_redis)):
             user_id: int = dbc.get_user_id_by_email(email)['id']
             dbc.create_first_collection(user_id=user_id, last_update_date=datetime.now())
             
-            await delete_email_verification_code(email, redis_client)
+            await rc.delete_email_vercode(email, redis_client)
 
             return {
                 "status": True,
@@ -553,7 +386,7 @@ async def add_user(request: AddUserRequest, redis_client = Depends(get_redis)):
         
         user_id: int = dbc.get_user_id_by_email(email)['id']
         dbc.create_first_collection(user_id=user_id, last_update_date=datetime.now())
-        await delete_email_verification_code(email, redis_client)
+        await rc.delete_email_vercode(email, redis_client)
         
         return {"status": True}
 
@@ -582,19 +415,6 @@ async def complete_2fa_registration(data: Complete2FARegistration):
 
     except Exception as ex:
         print(f"[complete_2fa_registration] Error :: {ex}")
-        raise HTTPException(status_code=500, detail="Server error")
-    
-@app.post("/remove_user")  # - корректно
-def remove_user(request: RemoveUserRequest):
-    print(request)
-    try:
-        result = dbc.remove_user(user_id=request.user_id, 
-                                 admin_id=request.admin_id, 
-                                 comment=request.comment)
-        return result
-    
-    except Exception as _ex:
-        print(f"[app.py->remove_user]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
     
 @app.post("/update_user_profile")
@@ -633,7 +453,7 @@ async def login_user(request: LoginUserRequest, response: Response, redis_client
             )
 
         user_id = int(db_answer["id"])
-        session_id = await create_session(user_id, redis_client)
+        session_id = await rc.create_session(user_id, redis_client)
 
         response.set_cookie(
             key="session_id",
@@ -651,7 +471,6 @@ async def login_user(request: LoginUserRequest, response: Response, redis_client
         print(f"[app.py->login_user]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
 
-# -----------------
 @app.get("/get_user_info")
 async def get_user_info(request: Request, redis_client = Depends(get_redis)):
     try:
@@ -703,8 +522,6 @@ async def get_user_info(request: Request, redis_client = Depends(get_redis)):
         print(f"[app.py->get_user_info]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
     
-# -----------------
-    
 @app.get("/me")
 async def get_me(user_id: int = Depends(get_current_user_id_from_redis)):
     try:
@@ -730,7 +547,6 @@ async def check_auth(user_id: int = Depends(get_current_user_id_from_redis)):
     except Exception as _ex:
         print(f"[app.py->check_auth]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
-    
 
 @app.post("/logout")
 async def logout(request: Request, response: Response, redis_client = Depends(get_redis)):
@@ -738,7 +554,7 @@ async def logout(request: Request, response: Response, redis_client = Depends(ge
         session_id: str | None = request.cookies.get("session_id")
     
         if session_id:
-            await delete_session(session_id, redis_client)
+            await rc.delete_session(session_id, redis_client)
         
         response.delete_cookie(key="session_id", path="/", 
                             httponly=True, secure=False, samesite="lax")
@@ -756,7 +572,7 @@ async def send_email_with_code(request_body: VerificationEmailRequest,
     
     try:
         code: str = tls.generate_verification_code()
-        await create_email_verification_code(email, code, redis_client)
+        await rc.create_email_vercode(email, code, redis_client)
         success: bool = tls.send_verification_code_email(code=code, to_email=email)
         
         if success:
@@ -775,17 +591,34 @@ async def send_email_with_code(request_body: VerificationEmailRequest,
 #               stats logic
 # --------------------------------------------------
 
-@app.post("/get_news_stats")  
-def get_news_stats(request: TechSupRequest):
-    try:
-        stats: dict[str, int] = tls.get_stats(info=dbc.get_news_stats())
-        source_ids: dict[int, str] = dbc.get_sources()
-        
+@app.get("/get_text_stat")  
+def get_text_stat():
+    return {
+            'total_news': 12,
+            'total_sources': 42,
+            'total_users': 0,
+            'most_popular_source': 'CRINGE AHAHAHA'
+        }
 
-    except Exception as _ex:
-        print(f"[app.py->get_news_stats]. Error :: {_ex}")
-        raise HTTPException(status_code=500, detail="Server error")
+@app.get("/get_round_agency_stat")  
+def get_round_agency_stat():
+    return {
+        "agenc1": 100,
+        "agenc2": 180,
+        "agenc3": 127
+    }
 
+@app.get("/get_news_per_day_stat")  
+def get_news_per_day_stat():
+    return {
+        "1": 2,
+        "2": 39,
+        "3": 51,
+        "4": 41,
+        "5": 20,
+        "6": 9,
+        "7": 12
+    }
 
 # --------------------------------------------------
 #               techsup logic
