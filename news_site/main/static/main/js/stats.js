@@ -1,30 +1,3 @@
-// Глобальные переменные графиков
-let pieChartInstance = null;
-let barChartInstance = null;
-
-const chartColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
-
-// === ДЕМОНСТРАЦИОННЫЕ ДАННЫЕ (если бэкенд недоступен) ===
-const sampleTextData = {
-    total_news: "1248",
-    total_sources: "47",
-    total_users: "312",
-    most_popular_source: "РИА Новости"
-};
-
-const samplePieData = {
-    "Сборщик РИА": 32,
-    "Сборщик ТАСС": 27,
-    "Сборщик Интерфакс": 18,
-    "Сборщик Lenta": 14,
-    "Другие агенты": 9
-};
-
-const sampleBarData = {
-    "Пн": 92, "Вт": 118, "Ср": 87, "Чт": 134, "Пт": 76, "Сб": 41, "Вс": 59
-};
-
-// === БЛОК 2: Текстовая статистика ===
 function updateTextStats(data) {
     const map = {
         'total_news': 'total_news',
@@ -38,7 +11,6 @@ function updateTextStats(data) {
     });
 }
 
-// === БЛОК 4: Круговая диаграмма ===
 function renderPieChart(data) {
     const ctx = document.getElementById('pieChart');
     if (!ctx) return;
@@ -70,7 +42,6 @@ function renderPieChart(data) {
     });
 }
 
-// === БЛОК 3: Гистограмма (7 столбцов) ===
 function renderBarChart(data) {
     const ctx = document.getElementById('barChart');
     if (!ctx) return;
@@ -106,22 +77,14 @@ function renderBarChart(data) {
     });
 }
 
-// === Загрузка данных с API ===
-async function loadAllStats(useSample = false) {
+async function loadAllStats() {
     const endpoints = {
-        text: 'http://127.0.0.1:8000/get_text_stat',
-        pie: 'http://127.0.0.1:8000/get_round_agents_stat',
-        bar: 'http://127.0.0.1:8000/get_round_news_per_day_stat'
+        text: 'http://127.0.0.1:8001/get_text_stat',
+        pie: 'http://127.0.0.1:8001/get_round_agency_stat',
+        bar: 'http://127.0.0.1:8001/get_news_per_day_stat'
     };
 
     try {
-        if (useSample) {
-            updateTextStats(sampleTextData);
-            renderPieChart(samplePieData);
-            renderBarChart(sampleBarData);
-            return;
-        }
-
         const [textRes, pieRes, barRes] = await Promise.all([
             fetch(endpoints.text), fetch(endpoints.pie), fetch(endpoints.bar)
         ]);
@@ -135,10 +98,7 @@ async function loadAllStats(useSample = false) {
         renderBarChart(barData);
 
     } catch (e) {
-        console.warn('Бэкенд недоступен — используются демонстрационные данные');
-        updateTextStats(sampleTextData);
-        renderPieChart(samplePieData);
-        renderBarChart(sampleBarData);
+        showToast('Ошибка сервера', duration=2000, type="red");
     }
 }
 
@@ -149,14 +109,20 @@ async function refreshStats() {
         btn.disabled = true;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обновление...';
     }
-    await loadAllStats(false);
+    await loadAllStats();
     if (btn) {
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Обновить</span>';
     }
 }
 
-// Запуск при загрузке
 document.addEventListener('DOMContentLoaded', () => {
-    loadAllStats(false); // сначала пытается реальный API, потом fallback
+    loadAllStats();
 })
+
+loadAllStats();
+
+const refreshBtn = document.querySelector('.refresh-btn');
+if (refreshBtn) {
+    refreshBtn.addEventListener('click', refreshStats);
+}

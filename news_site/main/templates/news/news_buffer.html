@@ -60,7 +60,6 @@
     <div class="comments-section new_buffer_comments">
     <h3 class="comments-title">Комментарии</h3>
     
-    <!-- Форма добавления комментария -->
     <div class="comment-form">
         <div class="comment-input-wrapper">
             <input 
@@ -73,9 +72,7 @@
         <button id="send-comment-btn" class="send-comment-btn">Отправить</button>
     </div>
 
-    <!-- Список комментариев -->
     <div id="comments-list" class="comments-list">
-        <!-- Заполняется через JS -->
     </div>
 </div>
 
@@ -107,7 +104,6 @@
 
 
 <script>
-    // Инициализация функционала страницы буфера новости
     document.addEventListener('DOMContentLoaded', function() {
         initNewsBufferPage();
     });
@@ -119,4 +115,7 @@
 {% block scripts %}
 {% load static %}
 <script src="{% static 'main/js/news_buffer.js' %}"></script>
+
+<link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'main/css/news_buffer.css' %}">
 {% endblock %}

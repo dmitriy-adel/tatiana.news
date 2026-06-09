@@ -1,5 +1,9 @@
 {% extends 'main/base.html' %}
 {% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'main/css/styles.css' %}">
+<link rel="stylesheet" href="{% static 'main/css/stats.css' %}">
 
 <!-- БЛОК 1 (заголовок страницы — чистый, без фона и рамки) -->
 <div class="block block1">

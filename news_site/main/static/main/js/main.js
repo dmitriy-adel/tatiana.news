@@ -1,41 +1,5 @@
 // ====================== Категории новостей ======================
 
-// подгрузка категорий новостей, которые крутятся в верхней части страницы
-// async function loadNewsClasses() {
-//     const container = document.getElementById('categoriesContainer');
-//     if (!container) return;
-
-//     try {
-//         const response = await fetch('http://127.0.0.1:8001/get_news_classes', {
-//             method: 'GET',
-//             headers: { 'Accept': 'application/json' },
-//             signal: AbortSignal.timeout(10000)
-//         });
-
-//         if (!response.ok) {
-//             showToast("Ошибка сервера", duration=2000, type="red")
-//         }
-//         else {
-//             const classesDict = await response.json();
-//             container.innerHTML = '';
-
-//             Object.entries(classesDict).forEach(([classId, className]) => {
-//                 const pill = document.createElement('div');
-//                 pill.className = 'category-pill';
-//                 pill.textContent = className;
-//                 pill.dataset.id = classId;
-//                 container.appendChild(pill);
-//             });
-
-//             updateScrollButtons();
-//             setTimeout(updateScrollButtons, 100);
-//         }
-
-//     } catch (error) {
-//         container.innerHTML = `<div class="loading-text">Не удалось загрузить категории. Обновите страницу через несколько секунд</div>`;
-//     }
-// }
-
 async function loadNewsClasses() {
     const container = document.getElementById('categoriesContainer');
     if (!container) return;
@@ -51,7 +15,7 @@ async function loadNewsClasses() {
             showToast("Ошибка сервера", 2000, "red");
         } else {
             const classesDict = await response.json();
-            allNewsClasses = Object.entries(classesDict); // [[id, name], ...]
+            allNewsClasses = Object.entries(classesDict);
 
             currentCategoryIndex = 0;
             updateItemsPerPage();
@@ -63,26 +27,6 @@ async function loadNewsClasses() {
     }
 }
 
-// function updateItemsPerPage() {
-//     const container = document.getElementById('categoriesContainer');
-//     if (!container || allNewsClasses.length === 0) return;
-
-//     // Создаём временный элемент, чтобы точно узнать текущую ширину блока (учитывает @media)
-//     const temp = document.createElement('div');
-//     temp.className = 'category-pill';
-//     temp.textContent = 'Тест';
-//     temp.style.visibility = 'hidden';
-//     temp.style.position = 'absolute';
-//     container.appendChild(temp);
-
-//     const pillWidth = temp.offsetWidth;
-//     const gap = 12;
-//     container.removeChild(temp);
-
-//     const availableWidth = container.clientWidth;
-//     itemsPerPage = Math.max(2, Math.floor((availableWidth + gap) / (pillWidth + gap)));
-// }
-
 function updateItemsPerPage() {
     const container = document.getElementById('categoriesContainer');
     if (!container) return;
@@ -90,7 +34,6 @@ function updateItemsPerPage() {
     const sidebar = document.querySelector('.tabs');
     const sidebarWidth = sidebar ? sidebar.offsetWidth : 240;
 
-    // Более сильный костыль + динамика
     let availableWidth = window.innerWidth - sidebarWidth - 180;
 
     if (availableWidth < 300) {
@@ -100,9 +43,7 @@ function updateItemsPerPage() {
     const pillWidth = getCurrentPillWidth();
     const gap = 12;
 
-    // === ГЛАВНОЕ ИЗМЕНЕНИЕ ===
-    // Делаем расчёт более "жадным" — учитываем, что блоки занимают больше места
-    const effectiveWidthPerItem = pillWidth + 38; // +38px на каждый блок (воздух + агрессия)
+    const effectiveWidthPerItem = pillWidth + 38; 
 
     itemsPerPage = Math.max(2, Math.floor(availableWidth / effectiveWidthPerItem));
 
@@ -130,25 +71,6 @@ function renderVisibleCategories() {
     updateScrollButtons();
 }
 
-// функция скролла категорий новостей в верхней части страницы
-// function scrollCategories(direction) {
-//     const container = document.getElementById('categoriesContainer');
-//     if (!container) return;
-
-//     // Прокрутка ровно на один элемент (минимальное изменение)
-//     const firstPill = container.querySelector('.category-pill');
-//     if (!firstPill) return;
-
-//     const scrollAmount = firstPill.offsetWidth + 12; // 12 = gap из CSS
-
-//     container.scrollBy({
-//         left: direction * scrollAmount,
-//         behavior: 'smooth'
-//     });
-
-//     setTimeout(updateScrollButtons, 350);
-// }
-
 function scrollCategories(direction) {
     const container = document.getElementById('categoriesContainer');
     if (!container) return;
@@ -156,7 +78,7 @@ function scrollCategories(direction) {
     const firstPill = container.querySelector('.category-pill');
     if (!firstPill) return;
 
-    const scrollAmount = firstPill.offsetWidth + 12; // один элемент + gap
+    const scrollAmount = firstPill.offsetWidth + 12;
 
     container.scrollBy({
         left: direction * scrollAmount,
@@ -166,7 +88,6 @@ function scrollCategories(direction) {
     setTimeout(updateScrollButtons, 350);
 }
 
-// Отображение кнопок для скорлла ленты
 function updateScrollButtons() {
     const container = document.getElementById('categoriesContainer');
     const leftBtn = document.getElementById('scrollLeftBtn');
@@ -185,28 +106,12 @@ function updateScrollButtons() {
         return;
     }
 
-    // Показываем обе кнопки, если есть что скроллить
     leftBtn.classList.add('visible');
     rightBtn.classList.add('visible');
 
-    // Делаем их полупрозрачными в начале и в конце (но не прячем)
     leftBtn.style.opacity = (scrollLeft <= 8) ? '0.35' : '1';
     rightBtn.style.opacity = (scrollLeft >= maxScroll - 8) ? '0.35' : '1';
 }
-
-// function updateScrollButtons() {
-//     const leftBtn = document.getElementById('scrollLeftBtn');
-//     const rightBtn = document.getElementById('scrollRightBtn');
-//     if (!leftBtn || !rightBtn) return;
-
-//     const total = allNewsClasses.length;
-
-//     const canGoLeft = currentCategoryIndex > 0;
-//     const canGoRight = (currentCategoryIndex + itemsPerPage) < total;
-
-//     leftBtn.classList.toggle('visible', canGoLeft);
-//     rightBtn.classList.toggle('visible', canGoRight);
-// }
 
 function getCurrentPillWidth() {
     const w = window.innerWidth;
@@ -256,7 +161,6 @@ window.addEventListener('resize', () => {
 
                 renderVisibleCategories();
 
-                // Сколько реально отрисовано в DOM
                 const rendered = document.querySelectorAll('#categoriesContainer .category-pill').length;
                 console.log('%c[DEBUG] ОТРИСОВАНО В DOM:', 'color:#f0f; font-weight:bold', rendered);
             });
@@ -269,7 +173,6 @@ window.addEventListener('resize', () => {
 
 // ====================== Блоки новостей ======================
 
-// подгружает последние новости и отображает их на главную страницу
 async function loadMainNewsFeed() {
     const feedContainer = document.getElementById('newsFeed');
     if (!feedContainer) return;
@@ -314,10 +217,8 @@ function createNewsSection(className, newsArray) {
     section.innerHTML = `
         <h2 class="section-title">${className}</h2>
         <div class="news-grid">
-            <!-- Левая колонка — 2 большие карточки -->
             <div class="left-column"></div>
             
-            <!-- Правая колонка — список -->
             <div class="right-column"></div>
         </div>
     `;
@@ -325,12 +226,10 @@ function createNewsSection(className, newsArray) {
     const leftColumn = section.querySelector('.left-column');
     const rightColumn = section.querySelector('.right-column');
 
-    // Первые 2 новости — большие карточки
     for (let i = 0; i < Math.min(2, newsArray.length); i++) {
         leftColumn.appendChild(createBigNewsCard(newsArray[i]));
     }
 
-    // Остальные — в правый список (начиная с 3-й)
     for (let i = 2; i < newsArray.length; i++) {
         rightColumn.appendChild(createSmallNewsItem(newsArray[i]));
     }
@@ -338,7 +237,6 @@ function createNewsSection(className, newsArray) {
     return section;
 }
 
-// карточки новостей
 function createBigNewsCard(news) {
     const card = document.createElement('div');
     card.className = 'news-card big';
