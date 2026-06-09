@@ -26,7 +26,14 @@ let itemsPerPage = 6;
 
 let pieChartInstance = null;  // для статистики
 let barChartInstance = null;
-const chartColors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#14b8a6'];
+const chartColors = [
+    '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', 
+    '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'
+];
+
+
+let pieChartInstance = null;
+let barChartInstance = null;
 
 // !!==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================!!
 

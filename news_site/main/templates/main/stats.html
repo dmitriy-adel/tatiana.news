@@ -8,7 +8,7 @@
 <!-- БЛОК 1 (заголовок страницы — чистый, без фона и рамки) -->
 <div class="block block1">
     <h1 class="page-title">Раздел статистики портала</h1>
-    <button class="refresh-btn" onclick="refreshStats()">
+    <button class="refresh-btn">
         <i class="fas fa-sync-alt"></i>
         <span>Обновить</span>
     </button>
@@ -101,5 +101,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+
+<script src="{% static 'main/js/stats.js' %}"></script>
 
 {% endblock %}
