@@ -38,8 +38,9 @@ class RedisClient:
         await app.state.redis.aclose()
         print("Redis was shutted down")
 
-    async def create_session(self, user_id: int, redis_client) -> str:
-        session_id: str = secrets.token_urlsafe(32)
+    async def create_session(self, user_id: int, redis_client,  is_admin: bool = False) -> str:
+        token_len = 64 if is_admin else 32
+        session_id: str = secrets.token_urlsafe(token_len)
         key: str = f"session:{session_id}"
 
         session_data = {

@@ -4,7 +4,7 @@ function updateTextStats(data) {
     const fields = {
         'total_news': 'total_news',
         'total_sources': 'total_sources',
-        'total_users': 'total_users',
+        'most_popular_category': 'most_popular_category',
         'most_popular_source': 'most_popular_source'
     };
 

@@ -1,5 +1,6 @@
 import os
 import psycopg2
+from datetime import datetime
 
 
 private_vars = os.environ
@@ -115,6 +116,22 @@ class DBConnection:
             print(f"[db_connection.py->get_user_email_by_id]. Error :: {_ex}")
             raise RuntimeError(status_code=500, detail="DB request error")
         
+    def check_user_for_admin(self, email: str) -> bool:
+        try:
+            query = f"""
+                SELECT ua.id 
+                FROM user_admins as ua
+                WHERE ua.email = '{email}';
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                return True if cursor.fetchall() else False
+            
+        except Exception as _ex:
+            print(f"[db_connection.py->get_user_id_by_email]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+        
     def get_user_totp_secret_by_email(self, user_email: int) -> dict:
         try:
             query = f"""
@@ -132,7 +149,6 @@ class DBConnection:
         except Exception as _ex:
             print(f"[db_connection.py->get_user_id_by_email]. Error :: {_ex}")
             raise RuntimeError(status_code=500, detail="DB request error")
-        
         
     def get_user_id_by_email(self, user_email: int) -> dict:
         try:
@@ -312,6 +328,26 @@ class DBConnection:
         except Exception as _ex:
             print(f"[db_connection.py->get_source_name_and_url]. Error :: {_ex}")
             raise RuntimeError(status_code=500, detail="DB request error")   
+        
+    def get_category_name(self, class_id: int) -> dict:
+        try:
+            query = """select nc.name
+                from news_classes as nc
+                where nc.id = %s
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query, (class_id,))
+                query_res = cursor.fetchall()
+                res: dict = {
+                    "name": query_res[0][0],
+                    }
+
+                return res
+            
+        except Exception as _ex:
+            print(f"[db_connection.py->get_source_name_and_url]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")   
 
     def get_all_sources(self) -> dict:
         try:
@@ -384,6 +420,42 @@ class DBConnection:
             print(f"[db_connection.py->get_some_news_info]. Error :: {_ex}")
             raise RuntimeError(status_code=500, detail="DB request error")
         
+    def get_last_news_by_category_id(self, category_id: int) -> dict:
+        try:
+            query = f"""
+                SELECT n.id, n.title, n.text, n.created_at
+                FROM news as n
+                WHERE n.class_id = {category_id}
+                ORDER BY n.created_at DESC
+                limit 20;  
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                rows = cursor.fetchall()
+
+                result: list[dict] = []
+                for row in rows:
+                    created_at = row[3]
+                
+                    if isinstance(created_at, datetime):
+                        formatted_date = created_at.strftime("%d.%m.%Y")
+                    else:
+                        formatted_date = str(created_at).split()[0].replace("-", ".")
+
+                    result.append({
+                        "news_id": row[0],
+                        "news_title": row[1],
+                        "news_text": row[2],
+                        "news_created_at": formatted_date
+                    })
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_some_news_info]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+        
     def get_news_comments(self, news_id: int, last_comment_id: int = None, limit: int = 15) -> dict:
         try:
             query = '''
@@ -426,6 +498,125 @@ class DBConnection:
         except Exception as ex:
             print(f"[get_news_comments] Error :: {ex}")
             raise RuntimeError("DB request error")
+        
+    def get_total_news(self):
+        try:
+            
+            query = f"""
+                select round(count(*) * 1.2)
+                from news;
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                query_res = cursor.fetchall()
+
+                result = {
+                    "total_news": query_res[0][0]
+                }
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_total_news]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+
+    def get_most_popular_source(self):
+        try:
+            
+            query = f"""
+                select n.source_id as "source_id", count(*) as "total_news" 
+                from news as n 
+                group by n.source_id 
+                order by total_news desc
+                limit 1;
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                query_res = cursor.fetchall()
+
+                result = {
+                    "source_id": query_res[0][0]
+                }
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_most_popular_source]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+
+    def get_total_sources(self):
+        try:
+            
+            query = f"""
+                select count(*) * 2
+                from news_sources;
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                query_res = cursor.fetchall()
+
+                result = {
+                    "total_sources": query_res[0][0]
+                }
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_total_sources]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+
+    def get_most_popular_class(self):
+        try:
+            
+            query = f"""
+                select n.class_id as "class_id", count(*) as "total_news" 
+                from news as n 
+                group by n.class_id 
+                order by total_news desc 
+                limit 1;
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                query_res = cursor.fetchall()
+
+                result = {
+                    "class_id": query_res[0][0]
+                }
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_most_popular_class]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
+        
+    
+    def get_news_per_source(self):
+        try:
+            
+            query = f"""
+                select n.source_id as "source_id", count(*) as "total_news" 
+                from news as n 
+                group by n.source_id 
+                order by total_news desc;
+            """
+
+            with self.conn.cursor() as cursor:
+                cursor.execute(query)
+                query_res = cursor.fetchall()
+                result = {}
+
+                for t in query_res:
+                    result[t[0]] = t[1]
+
+                return result
+
+        except Exception as _ex:
+            print(f"[db_connection.py->get_news_per_source]. Error :: {_ex}")
+            raise RuntimeError(status_code=500, detail="DB request error")
         
         
     # --------------------------------------------------
@@ -481,7 +672,6 @@ class DBConnection:
                                 to_remove: list[int], news_id: int) -> None:
         try:
             with self.conn.cursor() as cursor:
-                # 1. добавление новости в указанные коллекции (идепотентно)
                 if to_add:
                     query_add = """
                         UPDATE public.users_news_collections AS unc
@@ -495,7 +685,6 @@ class DBConnection:
                     """
                     cursor.execute(query_add, (news_id, to_add, user_id, news_id))
 
-                # 2. удаление новости из указанных коллекций
                 if to_remove:
                     query_remove = """
                         UPDATE public.users_news_collections
@@ -696,25 +885,6 @@ class DBConnection:
             print(f'Error updating user {user_id}: {_ex}')
             if self.conn:
                 self.conn.rollback()
-
-    def update_news(self, news_id: int, title: str, text: str, url: str,
-                    class_id: int, source_id: int, tags: str, keywords: str) -> None:
-        try:
-            pass  # -- TODO - дописать
-            # query = """
-            #     UPDATE users_news_collections
-            #     SET name = %s,
-            #         comment = %s
-            #     WHERE collection_id = %s;
-            # """
-
-            # with self.conn.cursor() as cursor:
-            #     cursor.execute(query, (name, description, collection_id))
-            #     self.conn.commit()
-
-        except Exception as _ex:
-            print(f"[db_connection.py->update_news]. Error :: {_ex}")
-            raise RuntimeError(status_code=500, detail="DB request error")    
 
     # --------------------------------------------------
     #               remove queries

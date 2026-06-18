@@ -11,7 +11,7 @@ async function loadUserCollections() {
                 <button onclick="openLoginModal(event)" class="blue-btn">Войти</button>
             </div>
         `;
-        showToast('Требуется авторизация', 2500, 'red');
+        // showToast('Требуется авторизация', 2500, 'red');
     }
 
     try {

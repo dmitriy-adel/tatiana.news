@@ -13,7 +13,6 @@
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="header">
     <div class="logo" onclick="goHome()">T</div>
 
@@ -33,10 +32,8 @@
     </div>
 </header>
 
-<!-- ОСНОВНОЙ LAYOUT -->
 <div class="main-layout">
 
-    <!-- САЙДБАР -->
     <nav class="tabs">
         <div class="tab" onclick="goHome()">🏠 Главная</div>
         <div class="tab" onclick="goCollections()">📁 Коллекции</div>
@@ -44,14 +41,12 @@
         <div class="tab" onclick="goStats()">📊 Статистика</div>
     </nav>
 
-    <!-- КОНТЕНТ -->
     <div class="content">
         {% block content %}{% endblock %}
     </div>
 
 </div>
 
-<!-- FOOTER -->
 <footer class="footer">
     <nav class="footer-tabs">
         <div class="footer-tab" onclick="goSupport()">Поддержка</div>
@@ -59,7 +54,6 @@
     </nav>
 </footer>
 
-<!-- LOGIN MODAL -->
 <div id="loginModal" class="modal hidden">
     <span class="close-btn" onclick="closeModal('loginModal')">&times;</span>
     <label>Email</label>
@@ -71,7 +65,6 @@
     </button>
 </div>
 
-<!-- REGISTER MODAL -->
 <div id="registerModal" class="modal hidden">
     <span class="close-btn" onclick="closeModal('registerModal')">&times;</span>
     <label>Email</label>
@@ -83,7 +76,6 @@
     <button type="button" class="blue-btn" onclick="validateAndRegister()">Зарегистрироваться</button>
 </div>
 
-<!-- EMAIL VERIFICATION MODAL -->
 <div id="verifyEmailModal" class="modal hidden">
     <span class="close-btn" onclick="closeVerifyModal()">&times;</span>
     
@@ -102,37 +94,43 @@
     <button type="button" class="blue-btn" onclick="submitVerCodeUserLogin()">Подтвердить</button>
     
     <!-- <button type="button" class="link-btn" id="resendBtn" onclick="resendCode()" disabled>
-        Отправить код ещё раз (<span id="resendTimer">60</span> сек)
+        Отправить код ещё раз (<span id="resendTimer">60</span> сек)  TODO :: доработать функционал
     </button> -->
 </div>
 
-<!-- 2FA SETUP MODAL -->
 <div id="setup2FAModal" class="modal hidden">
     <span class="close-btn" onclick="close2FAModal()">&times;</span>
-    
-    <h2>Настройка Google Authenticator</h2>
-    <p>Отсканируйте QR-код в приложении<br>Google Authenticator</p>
-    
-    <div style="text-align: center; margin: 25px 0 30px;">
-        <img id="qrCodeImage" src="" alt="QR Code" 
-             style="max-width: 260px; height: auto; background: white; padding: 12px; border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+
+    <div class="modal-2fa-grid">
+        
+        <div class="modal-2fa-left">
+            <h2>Настройка Google Authenticator</h2>
+            <p>Отсканируйте QR-код в приложении<br>Google Authenticator</p>
+        </div>
+
+        <div class="modal-2fa-right">
+            <div class="qr-card">
+                <img id="qrCodeImage" src="" alt="QR Code">
+            </div>
+        </div>
+
     </div>
 
-    <p style="text-align:center; font-size:14px; color:#555; margin-bottom: 20px;">
-        Введите 6-значный код из приложения:
-    </p>
-    
-    <div class="code-inputs" id="totpCodeInputs">
+    <div class="modal-2fa-bottom">
+        <p class="code-label">Введите 6-значный код из приложения:</p>
+        
+        <div class="code-inputs" id="totpCodeInputs"></div>
+        
+        <div id="totpCodeError" class="error-message hidden">
+            Неверный код. Попробуйте ещё раз.
+        </div>
+        
+        <button type="button" class="blue-btn" onclick="submit2FACode()">
+            Подтвердить и завершить регистрацию
+        </button>
     </div>
-    
-    <div id="totpCodeError" class="error-message hidden">Неверный код. Попробуйте ещё раз.</div>
-    
-    <button type="button" class="blue-btn" onclick="submit2FACode()">
-        Подтвердить и завершить регистрацию
-    </button>
 </div>
 
-<!-- TOAST NOTIFICATION -->
 <div id="toast" class="toast">
     <span id="toast-text"></span>
 </div>
@@ -142,7 +140,7 @@
 </button>
 
 {% block scripts %}
-<!-- сюда подставится tech_sup.js и другие -->
+
 {% endblock %}
 
 
@@ -164,13 +162,18 @@
         z-index: 100;
     }
 
-        .header {
+    .header {
         position: fixed !important;
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
         height: var(--header-height) !important;
         z-index: 1100 !important;
+    }
+
+    .header.second {
+        background: #714aab !important;           
+        box-shadow: 0 2px 10px rgba(152, 98, 238, 0.25) !important;
     }
 
     .main-layout {

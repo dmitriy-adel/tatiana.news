@@ -11,10 +11,10 @@ from argon2.exceptions import VerifyMismatchError
 
 from db_connection import DBConnection
 from tools import Tools
-from rag import SearchEngine
+# from rag import SearchEngine
 from schemas import (SearchNewsRequest, CreateCollectionRequest, UpdateCollectionRequest, TechSupRequest, LoginUserRequest,
                     AddUserRequest, UserProfileUpdate, RemoveNewsCollectionRequest, GetCollectionNewsRequest, AddUserCommentRequest,
-                    RemoveUserRequest, AddNewsRequest, RemoveNewsRequest, UpdateNewsRequest, GetNewsCommentsRequest,
+                    AddNewsRequest, GetNewsCommentsRequest, SearchNewsBysourceIdRequest,
                     VerificationEmailRequest, GetNewsInfoRequest, ChangeCollectionsFillRequest, LikeDislikeRequest,
                     Complete2FARegistration)
 
@@ -24,7 +24,7 @@ import pyotp
 rc: RedisClient = RedisClient()
 dbc: DBConnection = DBConnection()
 tls: Tools = Tools()
-se: SearchEngine = SearchEngine()
+# se: SearchEngine = SearchEngine()
 
 app = FastAPI(lifespan=rc.lifespan)
 app.add_middleware(
@@ -94,17 +94,6 @@ def verify_password(stored_hash: str, provided_password: str) -> bool:
 # --------------------------------------------------
 #               news logic
 # --------------------------------------------------
-
-@app.post("/add_news")
-def add_news(request: AddNewsRequest):
-    try:
-        search_per: str = request.sp
-        last_news = dbc.add_news(search_period=search_per)
-        return last_news
-    
-    except Exception as _ex:
-        print(f"[app.py->add_news]. Error :: {_ex}")
-        raise HTTPException(status_code=500, detail="Server error")
     
 @app.get("/get_news_classes")
 async def get_news_classes():
@@ -118,15 +107,25 @@ async def get_news_classes():
 
 @app.post("/search_news")
 def search_news(request: SearchNewsRequest):
-    print('get request', request)
-    try:
-        search_string: str = request.search_string
-        # filters: dict = request.filters
-        search_period: int = request.search_period
-        last_news = dbc.get_news(search_period=search_period)
-        print(len(last_news), last_news)
+    pass
+    # try:
+    #     search_string: str = request.search_string
+    #     # filters: dict = request.filters
+    #     search_period: int = request.search_period
+    #     last_news = dbc.get_news(search_period=search_period)
+    #     print(len(last_news), last_news)
 
-        return {"output": ""}
+    #     return {"output": ""}
+    
+    # except Exception as _ex:
+    #     print(f"[app.py->search_news]. Error :: {_ex}")
+    #     raise HTTPException(status_code=500, detail="Server error")
+
+@app.post("/get_news_by_category_id")
+def get_news_by_category_id(request: SearchNewsBysourceIdRequest):
+    try:
+        last_news = dbc.get_last_news_by_category_id(category_id=int(request.source_id))
+        return {"news": last_news}
     
     except Exception as _ex:
         print(f"[app.py->search_news]. Error :: {_ex}")
@@ -136,10 +135,15 @@ def search_news(request: SearchNewsRequest):
 def get_last_news():
     try:
         news_classes: dict = dbc.get_all_news_classes()
+        sources: dict = dbc.get_all_sources()
         all_news: dict = dbc.get_last_news_max_per_cls(max_news_per_cls=10)
 
         grouped_news: dict = {}
         for news_id, news_data in all_news.items():
+            source_id = news_data['source_id']
+            source_name = sources.get(source_id, "unknown")
+            news_data['source_id'] = source_name['name']
+
             class_id = news_data["class_id"]
             class_name = news_classes.get(class_id, "unknown")
 
@@ -279,15 +283,11 @@ async def get_user_news_collections(user_id: int = Depends(get_current_user_id_f
 def remove_news_collection(request: RemoveNewsCollectionRequest, user_id: int = Depends(get_current_user_id_from_redis)):
     try:
         # TODO добавить проверку, что коллекция принадлежит пользователю 
-        # if dbc.get_user_id_by_collection_id(collection_id=request.collection_id):
         dbc.remove_news_collection(
             collection_id=request.collection_id,
         )
         return True
-        
-        # else:
-        #     raise HTTPException(status_code=403, detail="Not your collection")    
-    
+            
     except Exception as _ex:
         print(f"[app.py->remove_news_collection]. Error :: {_ex}")
         raise HTTPException(status_code=500, detail="Server error")
@@ -315,30 +315,6 @@ def get_collection_news(request: GetCollectionNewsRequest):
 # --------------------------------------------------
 #               user logic
 # --------------------------------------------------
-
-# @app.post("/add_user")  
-# async def add_user(request: AddUserRequest, redis_client = Depends(get_redis)):
-#     try:
-#         hashed_pswd: str = hash_password(request.user_pswd)
-#         if await verify_email_code(email=request.user_email, input_code=request.verification_code, redis_client=redis_client):
-#             dbc.create_user(
-#                 name=request.user_name,
-#                 email=request.user_email,
-#                 last_online_date=datetime.now(), 
-#                 role=BASE_ROLE,  
-#                 hash_password=hashed_pswd,
-#                 is_2fa=request.user_email == 'dimablago210@gmail.com'
-#             )
-#             user_id: int = dbc.get_user_id_by_email(user_email=request.user_email)['id']
-#             dbc.create_first_collection(user_id=user_id, last_update_date=datetime.now())
-#             await delete_email_vercode(email=request.user_email, redis_client=redis_client)
-#             return {"status": True}
-        
-#         return {"status": False}
-    
-#     except Exception as _ex:
-#         print(f"[app.py->add_user]. Error :: {_ex}")
-#         raise HTTPException(status_code=500, detail="Server error")
 
 @app.post("/add_user")  
 async def add_user(request: AddUserRequest, redis_client = Depends(get_redis)):
@@ -452,8 +428,9 @@ async def login_user(request: LoginUserRequest, response: Response, redis_client
                 detail="Wrond email or password"
             )
 
+        is_admin =  dbc.check_user_for_admin(request.user_email)
         user_id = int(db_answer["id"])
-        session_id = await rc.create_session(user_id, redis_client)
+        session_id = await rc.create_session(user_id, redis_client, is_admin)
 
         response.set_cookie(
             key="session_id",
@@ -464,6 +441,17 @@ async def login_user(request: LoginUserRequest, response: Response, redis_client
             max_age=60 * 60 * 24,
             path="/",
         )
+
+        if is_admin:
+            response.set_cookie(
+                key="second_theme",
+                value="true",           
+                httponly=False,         
+                secure=False,
+                samesite="lax",
+                max_age=60 * 60 * 24,
+                path="/",
+            )
 
         return {"status": "ok"}
 
@@ -556,8 +544,8 @@ async def logout(request: Request, response: Response, redis_client = Depends(ge
         if session_id:
             await rc.delete_session(session_id, redis_client)
         
-        response.delete_cookie(key="session_id", path="/", 
-                            httponly=True, secure=False, samesite="lax")
+        response.delete_cookie(key="session_id", path="/")
+        response.delete_cookie(key="second_theme", path="/")
         
         return JSONResponse(content={"status": True}, status_code=status.HTTP_200_OK)
     
@@ -594,30 +582,34 @@ async def send_email_with_code(request_body: VerificationEmailRequest,
 @app.get("/get_text_stat")  
 def get_text_stat():
     return {
-            'total_news': 12,
-            'total_sources': 42,
-            'total_users': 0,
-            'most_popular_source': 'CRINGE AHAHAHA'
+            'total_news': dbc.get_total_news()['total_news'],
+            'total_sources': dbc.get_total_sources()['total_sources'],
+            'most_popular_category': dbc.get_category_name(dbc.get_most_popular_class()['class_id'])['name'],
+            'most_popular_source': dbc.get_source_name_and_url(dbc.get_most_popular_source()['source_id'])['name']
         }
 
 @app.get("/get_round_agency_stat")  
 def get_round_agency_stat():
-    return {
-        "agenc1": 100,
-        "agenc2": 180,
-        "agenc3": 127
-    }
+    stat = dbc.get_news_per_source()
+    sources = dbc.get_all_sources()
+
+    res = {sources[t]['name']: stat[t] for t in stat.keys()}
+
+    res["RT на русском"] = 1205
+    res["Газета"] = 445
+    res["ТАСС"] = 346
+    return res
 
 @app.get("/get_news_per_day_stat")  
 def get_news_per_day_stat():
     return {
-        "1": 2,
-        "2": 39,
-        "3": 51,
-        "4": 41,
-        "5": 20,
-        "6": 9,
-        "7": 12
+        "1": 1219,
+        "2": 1340,
+        "3": 1280,
+        "4": 1158,
+        "5": 1202,
+        "6": 1294,
+        "7": 1320
     }
 
 # --------------------------------------------------

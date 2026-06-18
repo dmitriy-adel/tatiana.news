@@ -95,17 +95,6 @@
 
 /* ОБЩИЙ ЛЭЙАУТ */
 
-/* .header {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    background: #1e3a8a;
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    position: relative; 
-    z-index: 100;
-} */
-
 .page-title {
     text-align: center;
     margin-bottom: 40px;
@@ -218,22 +207,6 @@
     color: #1e3a8a;
 }
 
-/* .main-layout {
-    display: flex;
-} */
-
-/* .tabs {
-    width: 240px;
-    min-width: 240px;
-    padding: 20px 0;
-    background: #fafafa;
-    border-right: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-    height: calc(100vh - 140px);
-    overflow-y: auto;
-} */
-
 .tab {
     padding: 12px 24px;
     cursor: pointer;
@@ -279,7 +252,127 @@
     padding: 20px;
 }
 
-/* .footer {
-    padding: 10px;
-    background: #f5f5f5;
-} */
+/* 2fa при регистрации */
+/* === Горизонтальная модалка 2FA === */
+#setup2FAModal {
+    width: 620px;
+    max-width: 95vw;
+    padding: 28px 32px 32px;
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.18);
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+}
+
+/* Сетка двух колонок */
+.modal-2fa-grid {
+    display: grid;
+    grid-template-columns: 1fr 220px;
+    gap: 32px;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+/* Левая колонка */
+.modal-2fa-left h2 {
+    margin: 0 0 10px 0;
+    font-size: 21px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.modal-2fa-left p {
+    margin: 0;
+    font-size: 15px;
+    color: #444;
+    line-height: 1.5;
+}
+
+/* Правая колонка — QR */
+.modal-2fa-right {
+    display: flex;
+    justify-content: center;
+}
+
+.qr-card {
+    background: white;
+    padding: 12px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.qr-card img {
+    display: block;
+    width: 100%;
+    max-width: 196px;
+    height: auto;
+}
+
+/* Нижняя часть */
+.modal-2fa-bottom {
+    border-top: 1px solid #eee;
+    padding-top: 24px;
+}
+
+.code-label {
+    text-align: center;
+    font-size: 14.5px;
+    color: #555;
+    margin: 0 0 14px 0;
+}
+
+#setup2FAModal .code-inputs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+#totpCodeError {
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+#setup2FAModal .blue-btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
+/* Крестик */
+#setup2FAModal .close-btn {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    font-size: 26px;
+    color: #999;
+    cursor: pointer;
+}
+
+@media (max-width: 640px) {
+    #setup2FAModal {
+        width: 94vw;
+        padding: 24px 20px 28px;
+    }
+    
+    .modal-2fa-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .modal-2fa-left p {
+        font-size: 14.5px;
+    }
+    
+    .qr-card img {
+        max-width: 180px;
+    }
+    
+    .modal-2fa-bottom {
+        padding-top: 20px;
+    }
+}

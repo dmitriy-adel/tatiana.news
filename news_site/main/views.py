@@ -22,6 +22,9 @@ def user_settings(request):
 def stats(request):
     return render(request, 'main/stats.html')
 
+def analytics_ib(request):
+    return render(request, 'main/analytics_ib.html')
+
 @csrf_exempt
 def get_tech_sup_appeal(request):
     if request.method == 'POST':
@@ -74,3 +77,85 @@ def news_detail(request, news_id):
     }
     
     return render(request, 'news/news_buffer.html', context)
+
+
+import requests
+from django.shortcuts import render
+from django.db.models import Q
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import News, NewsClass
+
+
+def search_view(request):
+    source_id = request.GET.get('source_id', '').strip()
+    category_param = request.GET.get('category', '').strip()
+    search_text = request.GET.get('text', '').strip()
+
+    # ====================== РЕЖИМ: Внешний сервис по source_id ======================
+    if source_id:
+        try:
+            response = requests.post(
+                'http://127.0.0.1:8001/get_news_by_category_id',
+                json={'source_id': source_id},
+                timeout=12
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            # Поддерживаем оба формата: {"news": [...]} и просто [...]
+            if isinstance(data, dict):
+                external_news = data.get('news', [])
+            else:
+                external_news = data
+
+            # Получаем имя для заголовка (если передаётся в GET)
+            # source_name = request.GET.get('source_name', f'ID {source_id}')
+
+            context = {
+                'external_news': external_news,
+                'source_id': source_id,
+                # 'source_name': source_name,
+                'is_external': True,
+            }
+            return render(request, 'search/search.html', context)
+
+        except requests.exceptions.RequestException as e:
+            context = {
+                'error': f'Не удалось загрузить новости. Попробуйте позже.',
+                'source_id': source_id,
+                'is_external': True,
+            }
+            return render(request, 'search/search.html', context)
+
+    # ====================== Обычный режим (локальная БД) ======================
+    news_list = News.objects.select_related('news_class', 'source').all()
+
+    current_class = None
+    if category_param:
+        current_class = NewsClass.objects.filter(name__iexact=category_param).first()
+        if current_class:
+            news_list = news_list.filter(news_class=current_class)
+
+    if search_text:
+        news_list = news_list.filter(
+            Q(title__icontains=search_text) |
+            Q(text__icontains=search_text) |
+            Q(key_words__icontains=search_text)
+        )
+
+    paginator = Paginator(news_list, 12)
+    page = request.GET.get('page', 1)
+    try:
+        page_obj = paginator.page(page)
+    except (EmptyPage, PageNotAnInteger):
+        page_obj = paginator.page(1)
+
+    context = {
+        'page_obj': page_obj,
+        'news_classes': NewsClass.objects.all().order_by('name'),
+        'current_class': current_class,
+        'search_text': search_text,
+        'category_param': category_param,
+        'is_external': False,
+    }
+    return render(request, 'search/search.html', context)

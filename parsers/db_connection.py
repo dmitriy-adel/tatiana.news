@@ -21,11 +21,11 @@ class DBConnection:
         )
         self.conn.autocommit = True
 
-    def add_news(self, source_id: int, url: str, title: str, text: str, vector: str, class_id: int = 1,) -> None:
+    def add_news(self, source_id: int, url: str, title: str, text: str, class_id: int) -> None:
         try:
             query = f"""
                 INSERT INTO news(class_id, source_id, url, title, text, vector)
-                VALUES ('{class_id}', '{source_id}', '{url}', '{title}', '{text}', '{vector}');
+                VALUES ('{class_id}', '{source_id}', '{url}', '{title}', '{text}', '');
             """
     
             with self.conn.cursor() as cursor:
@@ -74,4 +74,4 @@ class DBConnection:
         except Exception as _ex:
             print(f"[parsers->db_connection->get_parsed_urls_by_source]. Error :: {_ex}")
             raise RuntimeError(status_code=500, detail="DB request error")
-        
+    

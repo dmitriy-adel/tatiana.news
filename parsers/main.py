@@ -1,134 +1,350 @@
-import requests
-from bs4 import BeautifulSoup
-from urllib.parse import urljoin
-import time
-import json
-import os
-from typing import List, Dict, Optional
 
-from models_manager import Vectorier
+# from datetime import datetime
+# # from models_manager import Vectorier
+# import time
+# from tools import Tools
+# from db_connection import DBConnection
+
+# from lenta_parser import LentaParser
+# from mkru_parser import MKRuParser
+# from vesti_parser import VestiParser
+
+
+# class ParserModule:
+#     def __init__(self):
+#         print("Инициализация ParserModule v3 (даты + стриминг + 8 сек задержка)...")
+#         self.mk_pars = MKRuParser()
+#         self.lenta_pars = LentaParser()
+#         self.vesti_pars = VestiParser()
+
+#         self.dbc = DBConnection()
+#         self.tls = Tools()
+#         # self.vect = Vectorier()
+
+#         self.sources_map = self.dbc.get_sources_map()
+#         print(f"✓ Карта источников загружена")
+
+#     def _get_parsed_urls(self, source_id: int) -> set:
+#         try:
+#             urls = self.dbc.get_parsed_urls_by_source(source_id=source_id)
+#             return set(urls) if urls else set()
+#         except Exception:
+#             return set()
+
+#     def process_lenta_by_dates(self, start_date: datetime, end_date: datetime, 
+#                                delay: float = 8.0, max_pages_per_day: int = 5,
+#                                max_days: int = None):
+
+#         already_parsed = self._get_parsed_urls(1)
+#         added = skipped = day_count = 0
+
+#         for current_date in self.tls.generate_dates_backward(start_date, end_date):
+#             if max_days and day_count >= max_days:
+#                 print(f"Достигнут лимит max_days={max_days}")
+#                 break
+
+#             date_str = self.tls.format_lenta_date(current_date)
+#             day_count += 1
+#             print(f"\n▶️  {current_date.date()}  ({date_str})")
+
+#             try:
+#                 for article in self.lenta_pars.stream_news_for_date(
+#                     date_str=date_str,
+#                     delay=delay,
+#                     max_pages=max_pages_per_day
+#                 ):
+#                     url = article["url"]
+#                     if url in already_parsed:
+#                         skipped += 1
+#                         continue
+
+#                     title = article.get("title", "").strip()
+#                     text = article.get("text", "").strip()
+
+#                     if len(text) < 100:
+#                         continue
+
+#                     self.dbc.add_news(
+#                         source_id=1,
+#                         url=url,
+#                         title=title,
+#                         text=text,
+#                         class_id=1
+#                     )
+#                     added += 1
+#                     print(f"   ✓ Сохранено [{added}] {title[:65]}")
+
+#             except Exception as e:
+#                 print(f"   ❌ Ошибка на дате {date_str}: {e}")
+
+#         time.sleep(4)
+
+#         print(f"\n→ Lenta завершено. Дней обработано: {day_count} | Добавлено: {added} | Пропущено: {skipped}")
+
+#     def process_mk_by_dates(self, start_date: datetime, end_date: datetime,
+#                             delay: float = 8.0, max_days: int = None):
+#         """Парсит MK.ru по датам (задом наперёд)"""
+#         print("\n" + "="*70)
+#         print("📥 MK.RU — парсинг по датам (задом наперёд)")
+#         print("="*70)
+
+#         already_parsed = self._get_parsed_urls(2)
+#         added = skipped = day_count = 0
+
+#         for current_date in self.tls.generate_dates_backward(start_date, end_date):
+#             if max_days and day_count >= max_days:
+#                 print(f"Достигнут лимит max_days={max_days}")
+#                 break
+
+#             date_str = self.tls.format_mk_date(current_date)
+#             day_count += 1
+#             print(f"\n▶️  {current_date.date()}  ({date_str})")
+
+#             try:
+#                 for article in self.mk_pars.stream_news_for_date(
+#                     date_str=date_str,
+#                     delay=delay
+#                 ):
+#                     url = article["url"]
+#                     if url in already_parsed:
+#                         skipped += 1
+#                         continue
+
+#                     title = article.get("title", "").strip()
+#                     text = article.get("text", "").strip()
+
+#                     if len(text) < 100:          # поднял до 100 для единообразия с Lenta
+#                         continue
+
+#                     self.dbc.add_news(
+#                         source_id=2,
+#                         url=url,
+#                         title=title,
+#                         text=text,
+#                         class_id=1
+#                     )
+#                     added += 1
+#                     print(f"   ✓ Сохранено [{added}] {title[:65]}")
+
+#             except Exception as e:
+#                 print(f"   ❌ Ошибка на дате {date_str}: {e}")
+
+#         time.sleep(2)
+
+#         print(f"\n→ MK.ru завершено. Дней обработано: {day_count} | Добавлено: {added} | Пропущено: {skipped}")
+
+#     def process_vesti_recent(self, max_articles: int = 350, delay: float = 3.0):
+#         """
+#         Парсит свежие новости из ленты Vesti.ru (/ns)
+#         Использует Playwright для подгрузки секций + requests для статей
+#         """
+#         print("\n" + "="*70)
+#         print("📥 VESTI.RU — парсинг свежих новостей из ленты")
+#         print("="*70)
+
+#         already_parsed = self._get_parsed_urls(3)   # source_id = 3 для Vesti
+#         added = skipped = 0
+
+#         print(f"Собираем до {max_articles} статей из ленты...")
+#         try:
+#             news_dict = self.vesti_pars.get_vesti_news(max_articles=max_articles)
+#         except Exception as e:
+#             print(f"❌ Ошибка при сборе ссылок Vesti: {e}")
+#             return
+
+#         print(f"Получено {len(news_dict)} статей. Начинаем обработку...\n")
+
+#         for idx, (url, article) in enumerate(news_dict.items(), 1):
+#             if url in already_parsed:
+#                 skipped += 1
+#                 continue
+
+#             title = article.get("title", "").strip()
+#             text = article.get("text", "").strip()
+
+#             if len(text) < 100:
+#                 continue
+
+#             try:
+#                 self.dbc.add_news(
+#                     source_id=3,
+#                     url=url,
+#                     title=title,
+#                     text=text,
+#                     class_id=1
+#                 )
+#                 added += 1
+#                 print(f"   ✓ Vesti [{added}] {title[:70]}")
+#             except Exception as e:
+#                 print(f"   ❌ Ошибка сохранения {url}: {e}")
+
+#             time.sleep(delay)
+
+#         print(f"\n→ Vesti завершено. Добавлено: {added} | Пропущено (уже есть): {skipped}")
+
+#     def main_run(self, max_days: int = None):
+#         START = datetime(2026, 6, 12)
+#         END = datetime(2026, 6, 2)
+
+#         # # Lenta
+#         # self.process_lenta_by_dates(
+#         #     start_date=START,
+#         #     end_date=END,
+#         #     delay=8.0,
+#         #     max_pages_per_day=20,
+#         #     max_days=max_days
+#         # )
+
+#         # MK.ru
+#         self.process_mk_by_dates(
+#             start_date=START,
+#             end_date=END,
+#             delay=4.0,
+#             max_days=max_days
+#         )
+
+#         # self.process_vesti()
+
+
+# if __name__ == "__main__":
+#     module = ParserModule()
+
+#     module.main_run(max_days=None)
+
+
+
+from datetime import datetime
+import time
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from tools import Tools
 from db_connection import DBConnection
 
-class Parser():
+from lenta_parser import LentaParser
+from mkru_parser import MKRuParser
+from vesti_parser import VestiParser
+
+
+class ParserModule:
     def __init__(self):
-        self.dbc: DBConnection = DBConnection()
-        self.vect: Vectorier = Vectorier()
-        self.tls: Tools = Tools()
+        self.mk_pars = MKRuParser()
+        self.lenta_pars = LentaParser()
+        self.vesti_pars = VestiParser()
 
-        self.sources_map: dict = self.dbc.get_sources_map()
-        self.parsed_urls: list[str] = None
+        self.dbc = DBConnection()
+        self.tls = Tools()
 
-    def get_parsed_url_by_source(self, source_id: int) -> list[str]:
-        return self.dbc.get_parsed_urls_by_source(source_id=source_id)
+        self.sources_map = self.dbc.get_sources_map()
 
-    def scrape_lenta_article(self, url: str, session: requests.Session, source_id: int = 1) -> Dict[str, Optional[str]]:
+        self.db_lock = threading.Lock()
 
+    def _get_parsed_urls(self, source_id: int) -> set:
         try:
-            response = session.get(url, timeout=15)
-            response.raise_for_status()
-
-        except requests.RequestException as e:
-            print(f" Ошибка загрузки статьи {url}: {e}")
-            return {'url': url, 'title': None, 'text': None, 'status': 'error'}
-
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        title_tag = soup.find('span', class_='topic-body__title') or \
-                    soup.find('h1', class_='topic-body__title')
-        title = title_tag.get_text(strip=True) if title_tag else None
-
-        paragraphs = soup.find_all('p', class_='topic-body__content-text')
-        text_parts = [p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True)]
-        full_text = '\n\n'.join(text_parts)
-
-        return {
-            'url': url,
-            'title': title,
-            'text': full_text,
-            'source_id': source_id,
-        }
-
-    def add_to_db(self, article_info: dict) -> None:
-        try:
-            vector = str(self.vect.get_vector(text=self.tls.clean_to_vect(text=article_info['text'])))
-            self.dbc.add_news(source_id=article_info['source_id'], url=article_info['url'], 
-                              title=article_info['title'], text=article_info['text'], vector=vector)
-
-        except Exception as _ex:
-            print(f"[parsers->main->add_to_db]. Error :: {_ex}. Data :: {article_info}")
+            urls = self.dbc.get_parsed_urls_by_source(source_id=source_id)
+            return set(urls) if urls else set()
+        except Exception:
+            return set()
 
 
-    def scrape_lenta_day_incremental(self, base_url: str, delay: float = 10.0):
-        """
-        Постраничный парсинг архива + немедленное сохранение каждой статьи.
-        """
-        session = requests.Session()
-        session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-                        '(KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36'
-        })
+    def _mk_worker(self, start_date, end_date, delay, max_days, added_counter, lock):
+        """Рабочий поток для MK.ru"""
+        already_parsed = self._get_parsed_urls(2)
+        day_count = 0
 
-        page = 1
-        current_url = base_url.rstrip('/') + '/'
-        output_file = 'lenta_articles_2026-04-27.json'
+        for current_date in self.tls.generate_dates_backward(start_date, end_date):
+            if max_days and day_count >= max_days:
+                break
+            day_count += 1
 
-        if os.path.exists(output_file):
-            os.remove(output_file)
+            date_str = self.tls.format_mk_date(current_date)
+            print(f"\n[MK] ▶️ {current_date.date()} ({date_str})")
 
-
-        while True:
             try:
-                response = session.get(current_url, timeout=10)
-                response.raise_for_status()
-            except requests.RequestException as _ex:
-                print(f"[main.py->scrape_lenta_day_incremental]. Cant laod url {current_url}. Error :: {_ex}")
-                break
+                for article in self.mk_pars.stream_news_for_date(date_str=date_str, delay=delay):
+                    url = article["url"]
+                    if url in already_parsed:
+                        continue
 
-            soup = BeautifulSoup(response.text, 'html.parser')
+                    title = article.get("title", "").strip()
+                    text = article.get("text", "").strip()
+                    if len(text) < 100:
+                        continue
 
-            current_page_links: List[str] = []
-            for a_tag in soup.find_all('a', href=True):
-                href = a_tag['href'].strip()
-                if (href.startswith('/news/2026/04/25/') or 
-                    href.startswith('https://lenta.ru/news/2026/04/25/')):
-                    full_url = urljoin('https://lenta.ru', href)
-                    if full_url not in current_page_links:
-                        current_page_links.append(full_url)
+                    with lock:  # защищаем запись в БД
+                        self.dbc.add_news(source_id=2, url=url, title=title, text=text, class_id=1)
+                        added_counter[0] += 1
+                        print(f"[MK]   ✓ [{added_counter[0]}] {title[:60]}")
 
-            print(f"found {len(current_page_links)} articles on page {page}")
+            except Exception as e:
+                print(f"[MK] ❌ Ошибка на {date_str}: {e}")
 
-            for i, link in enumerate(current_page_links, 1):
-                print(f"  [{i:2d}/{len(current_page_links)}] Обрабатываем: {link}")
-                
-                article = self.scrape_lenta_article(link, session)
-                self.add_to_db(article_info=article)
-                
-                time.sleep(delay)
 
-            next_page = None
-            for a in soup.find_all('a', href=True):
-                if f'/page/{page + 1}/' in a['href']:
-                    next_page = urljoin('https://lenta.ru', a['href'])
-                    break
+    def _vesti_worker(self, max_articles, delay, added_counter, lock):
+        """Поток Vesti с динамической подгрузкой"""
+        already_parsed = self._get_parsed_urls(3)
 
-            if not next_page:
-                print("\n visited last page. breaking")
-                break
+        for article in self.vesti_pars.stream_recent_news(
+            max_new_articles=max_articles,
+            scroll_step=5,
+            max_scrolls_without_new=6,
+            article_delay=delay
+        ):
+            url = article["url"]
+            if url in already_parsed:
+                continue
 
-            current_url = next_page
-            page += 1
+            title = article.get("title", "").strip()
+            text = article.get("text", "").strip()
 
-            print(f"changing page to {page}. waiting {delay} seconds...")
-            time.sleep(delay)
+            if len(text) < 100:
+                continue
 
-        print(f"\n{'='*60}")
-        print(f"Парсинг завершён! Все статьи сохранены в файл:")
-        print(f"→ {output_file}")
-        print(f"{'='*60}")
+            with lock:
+                try:
+                    self.dbc.add_news(
+                        source_id=3,
+                        url=url,
+                        title=title,
+                        text=text,
+                        class_id=1
+                    )
+                    added_counter[0] += 1
+                    print(f"[Vesti] ✓ Сохранено [{added_counter[0]}] {title[:65]}")
+
+                except Exception as e:
+                    print(f"[Vesti] ❌ Ошибка сохранения: {e}")
+
+    def run_mk_and_vesti_parallel(self, max_days: int = None, vesti_articles: int = 400):
+        START = datetime(2026, 6, 12)
+        END = datetime(2026, 6, 2)
+
+        added_counter = [0]       
+        lock = self.db_lock
+
+        with ThreadPoolExecutor(max_workers=2) as executor:
+            # Запускаем оба парсера одновременно
+            future_mk = executor.submit(
+                self._mk_worker,
+                START, END, 4.0, max_days, added_counter, lock
+            )
+            future_vesti = executor.submit(
+                self._vesti_worker,
+                vesti_articles, 4.0, added_counter, lock
+            )
+
+            future_mk.result()
+            future_vesti.result()
+
+        print("\n" + "="*75)
+        print(f"✅ Параллельная обработка завершена. Всего добавлено: {added_counter[0]}")
+        print("="*75)
+
+    def main_run(self, max_days: int = None):
+        self.run_mk_and_vesti_parallel(max_days=max_days, vesti_articles=4000)
+
+        # self.process_lenta_by_dates(...)
+
 
 if __name__ == "__main__":
-    day_url = "https://lenta.ru/2026/04/25/"
-    pars: Parser = Parser()
-    
-    pars.scrape_lenta_day_incremental(base_url=day_url, delay=10.0)
+    module = ParserModule()
+    module.main_run(max_days=None)

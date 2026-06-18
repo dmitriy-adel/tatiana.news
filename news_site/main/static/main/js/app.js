@@ -20,7 +20,7 @@ let initialCollections = new Set();
 
 let currentSetupEmail = null;  // для генерации кода аутентификации
 
-let allNewsClasses = [];          // для категорий на главной странице
+let allNewsClasses = [];  // для категорий на главной странице
 let currentCategoryIndex = 0;
 let itemsPerPage = 6;
 
@@ -30,10 +30,6 @@ const chartColors = [
     '#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', 
     '#ef4444', '#06b6d4', '#ec4899', '#14b8a6'
 ];
-
-
-let pieChartInstance = null;
-let barChartInstance = null;
 
 // !!==================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ====================!!
 
@@ -51,13 +47,10 @@ function goToSettings() {window.location.href = '/user_settings';}
 
 // ==================== АВТОРИЗАЦИЯ ====================
 
-/*validateAndSendLogin*/ 
-// валидация данных и отправка запроса на логин
 async function validateAndLogin() {
     const emailField = document.getElementById('login_email');
     const passField = document.getElementById('login_password');
 
-    // сброс ошибок
     [emailField, passField].forEach(field => field.classList.remove('error'));
 
     if (!emailField.value.trim() || !passField.value.trim()) {
@@ -95,7 +88,6 @@ async function validateAndLogin() {
     }
 }
 
-/* validateAndSend*/ 
 // валидация данных и отправка запроса на регистрацию
 async function validateAndRegister() {
     const nameField  = document.getElementById('reg_name');
@@ -146,7 +138,6 @@ async function validateAndRegister() {
     }
 }
 
-// Выход из аккаунта
 async function logout() {
     try {
         const res = await fetch('http://127.0.0.1:8001/logout', {
@@ -158,21 +149,35 @@ async function logout() {
             signal: AbortSignal.timeout(10000)
         });
 
-        if (!res.ok) {
-            showToast('Ошибка сервера 3', duration=2000, type="red");       
+        document.cookie = "second_theme=; Max-Age=0; path=/";
+        const header = document.querySelector('header.header');
+        if (header) header.classList.remove('second');
+
+        const tabsNav = document.querySelector('nav.tabs');
+        if (tabsNav) {
+            const adminTab = tabsNav.querySelector('.tab.admin-ib');
+            if (adminTab) adminTab.remove();
         }
-        else {
+
+        if (!res.ok) {
+            showToast('Ошибка сервера при выходе', 2000, "red");
+        } else {
             currentUser = null;
             updateProfileMenu(false);
-            showToast('Вы вышли из аккаунта', duration=2000,);
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+
+            showToast('Вы вышли из аккаунта', 2000);
         }
 
     } catch (e) {
-        showToast('Ошибка сети при выходе', duration=2000, type="red");
+        showToast('Ошибка сети при выходе', 2000, "red");
     }
 }
 
-// Глобальное обновление UI после логина
+// обновление UI после логина
 async function updateUIAfterLogin() {
     try {
         const response = await fetch('http://127.0.0.1:8001/me', {
@@ -182,8 +187,7 @@ async function updateUIAfterLogin() {
         });
 
         if (!response.ok) {
-            // throw new Error('Не авторизован');
-            showToast("Ошибка сервера 4", duration=2000, type="red")
+            showToast("Ошибка сервера", duration=2000, type="red")
         }
         else {
             currentUser = await response.json();
@@ -197,7 +201,55 @@ async function updateUIAfterLogin() {
     }
 }
 
-// Обновление меню профиля
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
+function applySecondTheme() {
+    const secondTheme = getCookie('second_theme');
+    const header = document.querySelector('header.header');
+    
+    if (!header) return;
+
+    if (secondTheme === 'true') {
+        header.classList.add('second');
+        console.log('%c[Second Theme] Фиолетовая тема активирована', 'color:#5b21b6');
+    } else {
+        header.classList.remove('second');
+    }
+}
+
+function applyAdminTab() {
+    const secondTheme = getCookie('second_theme');
+    const tabsNav = document.querySelector('nav.tabs');
+    
+    if (!tabsNav) return;
+
+    const existingTab = tabsNav.querySelector('.tab.admin-ib');
+    if (existingTab) {
+        existingTab.remove();
+    }
+
+    if (secondTheme === 'true') {
+        const analyticsTab = document.createElement('div');
+        analyticsTab.className = 'tab admin-ib';
+        analyticsTab.innerHTML = '📈 Аналитика ИБ';
+        analyticsTab.onclick = goIBAnalytics;
+
+        tabsNav.appendChild(analyticsTab);
+
+        console.log('%c[Admin] Вкладка "Аналитика ИБ" добавлена', 'color:#5b21b6');
+    }
+}
+
+function goIBAnalytics() {
+    window.location.href = '/analytics-ib';
+}
+
+
 function updateProfileMenu(isLoggedIn) {
     const menu = document.getElementById('profileMenu');
     menu.innerHTML = '';
@@ -215,8 +267,7 @@ function updateProfileMenu(isLoggedIn) {
     }
 }
 
-/* submitVerificationCode*/
-// Отправка кода на сервер в процессе регистрации пользователя 
+// отправка кода на сервер в процессе регистрации пользователя 
 async function submitVerCodeUserLogin() {
     const code = getVerificationCode();   
     
@@ -417,19 +468,19 @@ async function submit2FACode() {
     }
 }
 
-// Прослушка для категорий новостей. Вызывает метод подгрузки классов новостей при загрузке страницы 
+// прослушка для категорий новостей. вызывает метод подгрузки классов новостей при загрузке страницы 
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     initScrollToTop();
 });
 
-// !!==================== АВТОРИЗАЦИЯ ====================!
-
-// !!====================== НАСТРОЙКИ ПРОФИЛЯ ======================!!
+document.addEventListener('DOMContentLoaded', () => {
+    applySecondTheme();
+    applyAdminTab();
+});
 
 // ====================== МОДАЛЬНЫЕ ОКНА ======================
 
-// Функция для открытия окна логина пользователя 
 function openLoginModal(event) {
     event.stopPropagation();
     const loginModal = document.getElementById('loginModal');
@@ -439,7 +490,6 @@ function openLoginModal(event) {
     registerModal.classList.add('hidden'); 
 }
 
-// Функция для открытия окна регистрации пользователя 
 function openRegisterModal(event) {
     event.stopPropagation();
     const loginModal = document.getElementById('loginModal');
@@ -449,8 +499,7 @@ function openRegisterModal(event) {
     loginModal.classList.add('hidden'); 
 }
 
-/* showVerificationModal*/
-// Функция для отикрытия окна ввода кода верификации в профиле. TODO переименовать
+// Функция для отикрытия окна ввода кода верификации в профиле
 function openVerCodeModalRegister(email, payload) {
     document.getElementById('verify_email_display').textContent = email;
 
@@ -468,19 +517,16 @@ function openVerCodeModalRegister(email, payload) {
     }, 100);
 }
 
-// Универсальная функция для закрытия модалки
 function closeModal(id) {
     document.getElementById(id).classList.add('hidden');
 }
 
 
-// TODO поменять вызов этой функции на вызов универсального закрытия модалки
 function closeVerifyModal() {
     document.getElementById('verifyEmailModal').classList.add('hidden');
     resetVerCodeInputsInModal();
 }
 
-// TODO поменять вызов этой функции на вызов универсального закрытия модалки
 function closeCancelModal() {
     const modal = document.getElementById('settings-cancel-modal');
     if (!modal) return;
@@ -498,10 +544,8 @@ function showToast(message, duration = 2000, type = 'blue') {
     const toast = document.getElementById('toast');
     const toastText = document.getElementById('toast-text');
 
-    // Сбрасываем все возможные классы цвета
     toast.classList.remove('toast-blue', 'toast-red');
 
-    // Добавляем нужный класс
     if (type === 'red') {
         toast.classList.add('toast-red');
     } 
@@ -517,7 +561,6 @@ function showToast(message, duration = 2000, type = 'blue') {
     }, duration);
 }
 
-// проверяет, аутентифицирован ли пользователь. сейчас этот запрос отправляет при каждой смене страницы, что может нагружать бэк. подумать, надо ли перерабатывать и как можно это сделать
 async function checkAuth() {
     try {
         const response = await fetch('http://127.0.0.1:8001/check_auth', {
@@ -542,7 +585,7 @@ async function checkAuth() {
     }
 }
 
-// Собирает код верификации из отдельных окошек в одно значение
+// собирает код верификации из отдельных окошек в одно значение
 function getVerificationCode() {
     let code = '';
     document.querySelectorAll('.code-digit').forEach(input => {
@@ -551,14 +594,14 @@ function getVerificationCode() {
     return code;
 }
 
-// Проверяет, заполнены ли окна для ввода кода верификации
+// проверяет, заполнены ли окна для ввода кода верификации
 function isCodeComplete() {
     return Array.from(document.querySelectorAll('.code-digit'))
                 .every(input => input.value.length === 1);
 }
 
-/*resetCodeInputs*/
-// функция обнуления ввода верификационного кода в модальное окно. TODO переименовать
+
+// функция обнуления ввода верификационного кода в модальное окно
 function resetVerCodeInputsInModal() {
     document.querySelectorAll('.code-digit').forEach(input => {
         input.value = '';
@@ -567,7 +610,7 @@ function resetVerCodeInputsInModal() {
     document.getElementById('codeError').classList.add('hidden');
 }
 
-// Вроде как, показывает меню профиля (настройки, выйти)
+// вроде как, показывает меню профиля (настройки, выйти)
 function toggleProfileMenu() {
     const menu = document.getElementById('profileMenu');
     menu.classList.toggle('hidden');
@@ -575,7 +618,7 @@ function toggleProfileMenu() {
 
 // ====================== ПРОСЛУШКА ======================
 
-// Функция для закрытия модалок при клике во вне. TODO посмотреть, есть ли еще модалки, которые можно сюда добавить 
+// функция для закрытия модалок при клике во вне
 window.addEventListener('click', function(e) {
     const profile = document.querySelector('.profile');
     const menu = document.getElementById('profileMenu');
@@ -592,7 +635,7 @@ window.addEventListener('click', function(e) {
     });
 });
 
-// Вроде как, функция для сокрытия модалки, аналогичная той, что выше. TODO сверить функции и удалить ненужную
+// вроде как, функция для сокрытия модалки, аналогичная той, что выше. TODO сверить функции и удалить ненужную
 window.addEventListener('click', function(e){
     const modals = ['loginModal','registerModal'];
     modals.forEach(id => {
@@ -612,7 +655,7 @@ window.addEventListener('click', function(e){
 
 // ======================== НОВОЕ. НАДО РАЗБИТЬ ПО БЛОКАМ ================================
 
-// Показывать/скрывать кнопку "Наверх" + учитывать футер
+// показывать или скрывать кнопку "Наверх" + учитывать футер
 function handleScrollToTopButton() {
     const btn = document.getElementById('scrollToTopBtn');
     if (!btn) return;
@@ -622,7 +665,6 @@ function handleScrollToTopButton() {
 
     let shouldShow = scrollY > 400;
 
-    // Если футер виден на экране — поднимаем кнопку выше
     if (footer) {
         const footerRect = footer.getBoundingClientRect();
         const isFooterVisible = footerRect.top < window.innerHeight && footerRect.bottom > 0;
@@ -641,7 +683,7 @@ function handleScrollToTopButton() {
     }
 }
 
-// Плавный скролл наверх
+// плавный скролл наверх
 function scrollToTop() {
     window.scrollTo({
         top: 0,
@@ -649,7 +691,7 @@ function scrollToTop() {
     });
 }
 
-// Инициализация кнопки "Наверх"
+// инициализация кнопки "Наверх"
 function initScrollToTop() {
     const btn = document.getElementById('scrollToTopBtn');
     if (!btn) return;
@@ -670,7 +712,6 @@ function saveSearchHistory(query) {
     if (!query.trim()) return;
 
     let history = getSearchHistory();
-    // убираем дубликаты
     history = history.filter(q => q !== query);
     history.unshift(query);
     history = history.slice(0, MAX_HISTORY);
@@ -682,15 +723,13 @@ function removeFromHistory(query) {
     let history = getSearchHistory();
     history = history.filter(q => q !== query);
     localStorage.setItem(SEARCH_KEY, JSON.stringify(history));
-    renderHistory(); // перерисовываем с учётом текущего ввода
+    renderHistory();
 }
 
-// Главная функция отрисовки с фильтрацией
 function renderHistory(filter = '') {
     const history = getSearchHistory();
     const lowerFilter = filter.toLowerCase().trim();
 
-    // Фильтруем: запрос должен НАЧИНАТЬСЯ с введённого текста
     let filteredHistory = history.filter(item => 
         item.toLowerCase().startsWith(lowerFilter)
     );
@@ -718,32 +757,27 @@ function renderHistory(filter = '') {
 
 // ==================== СОБЫТИЯ ====================
 
-// Основное событие — ввод текста
 searchInput.addEventListener('input', () => {
     const currentValue = searchInput.value;
     renderHistory(currentValue);
 });
 
-// Фокус на input (показываем полную историю, если ничего не введено)
 searchInput.addEventListener('focus', () => {
     if (!searchInput.value.trim()) {
         renderHistory(''); // показываем всё
     }
 });
 
-// Клик по элементу истории
 dropdown.addEventListener('click', (e) => {
     const item = e.target.closest('.history-item');
     if (!item) return;
 
-    // Нажали на крестик
     if (e.target.classList.contains('history-remove')) {
         const value = e.target.dataset.value;
         removeFromHistory(value);
         return;
     }
 
-    // Выбрали элемент
     const textEl = item.querySelector('.history-text');
     const value = textEl.textContent;
 
@@ -751,11 +785,8 @@ dropdown.addEventListener('click', (e) => {
     dropdown.classList.add('hidden');
     searchWrapper.classList.remove('active');
 
-    // Можно сразу запустить поиск
-    // console.log('Search:', value);
 });
 
-// Enter → сохранить в историю
 searchInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
         const query = searchInput.value.trim();
@@ -763,14 +794,10 @@ searchInput.addEventListener('keydown', (e) => {
             saveSearchHistory(query);
             dropdown.classList.add('hidden');
             searchWrapper.classList.remove('active');
-
-            console.log('Search performed:', query);
-            // Здесь можно добавить вызов реального поиска
         }
     }
 });
 
-// Клик вне области поиска → скрыть дропдаун
 document.addEventListener('click', (e) => {
     if (!e.target.closest('.search-wrapper')) {
         dropdown.classList.add('hidden');

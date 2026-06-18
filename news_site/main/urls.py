@@ -9,6 +9,8 @@ urlpatterns = [
     path('user_settings/', views.user_settings, name='user_settings'),
     path('stats/', views.stats, name='stats'),
     path('news/<int:news_id>/', views.news_detail, name='news_detail'),
+    path('search/', views.search_view, name='search-index'),
+    path('analytics-ib/', views.analytics_ib, name='search-index'),
 ]
 
 path('get_tech_sup_appeal/', views.get_tech_sup_appeal, name='get_tech_sup_appeal'),

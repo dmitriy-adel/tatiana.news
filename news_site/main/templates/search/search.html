@@ -1,0 +1,71 @@
+{% extends "main/base.html" %}
+
+{% block content %}
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+    {% if is_external %}
+        <div class="max-w-4xl mx-auto px-4 py-8">
+
+            <!-- Заголовок -->
+            <h1 class="text-3xl font-bold mb-8">
+                Новости 
+                {% if source_name %}
+                    <span class="text-blue-600">{{ source_name }}</span>
+                {% endif %}
+            </h1>
+
+            {% if error %}
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-xl mb-6">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            <div class="space-y-4">
+                {% for news in external_news %}
+                <div class="news-card big" 
+                    onclick="window.location.href='/news/{{ news.news_id }}/'"
+                    style="cursor: pointer; margin-bottom: 25px;">
+
+                    <div class="card-content">
+                        <h3 class="news-title">{{ news.news_title }}</h3>
+                        <p class="news-text">
+                            {{ news.news_text|default:''|truncatewords:45 }}
+                        </p>
+                        <div class="news-meta">
+                            <span class="time">
+                                {{ news.news_created_at|slice:":16" }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                    {% empty %}
+                        <p class="text-center text-gray-500 py-8">Новостей по этой категории пока нет.</p>
+                {% endfor %}
+                
+            </div>
+
+        </div>
+
+    {% else %}
+        <h1 class="text-3xl font-bold mb-6">Поиск новостей</h1>
+
+        <form method="get" action="{% url 'search-index' %}" class="mb-8 flex gap-3">
+            <input type="text" name="text" value="{{ search_text }}"
+                   placeholder="Поиск по заголовку, тексту или ключевым словам..."
+                   class="flex-1 border rounded-lg px-4 py-3 text-lg">
+            <button type="submit" class="bg-blue-600 text-white px-8 rounded-lg font-medium hover:bg-blue-700">
+                Найти
+            </button>
+        </form>
+
+
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'main/css/main.css' %}">
+{% endblock %}
