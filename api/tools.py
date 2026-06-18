@@ -25,12 +25,10 @@ class Tools:
 
     @staticmethod
     def simple_tokenize(text: str) -> str:
-        """Лёгкая токенизация: lower + только слова"""
         if not text:
             return []
 
         cleaned = re.sub(r'[^\w\s]', ' ', text.lower())
-        # Разбиваем и отбрасываем слишком короткие токены
         return [word for word in cleaned.split() if len(word) >= 2]
     
     @staticmethod
@@ -106,8 +104,7 @@ class Tools:
 
     @staticmethod
     def generate_2fa_qr(email: str, issuer_name: str = "T — News"):
-        """Генерирует секрет и QR-код в base64 для Google Authenticator"""
-        secret = pyotp.random_base32()                    # надёжный секрет
+        secret = pyotp.random_base32()                    
         totp = pyotp.TOTP(secret)
 
         provisioning_uri = totp.provisioning_uri(
@@ -115,7 +112,6 @@ class Tools:
             issuer_name=issuer_name
         )
 
-        # Создаём QR-код
         qr = qrcode.make(provisioning_uri)
         buffered = BytesIO()
         qr.save(buffered, format="PNG")

@@ -7,8 +7,7 @@ function initUserSettingsPage() {
     }
 }
 
-// инициализация модального окна подтверждения пароля
-function initPasswordModal() {  // обновил
+function initPasswordModal() {  
     const modal = document.getElementById('settings-password-modal');
     if (!modal) return;
 
@@ -127,7 +126,6 @@ async function loadUserSettings() {
     }
 }
 
-// логика кнопки сохранения изменений
 function setupSaveButtonLogic() {
     const saveBtn = document.getElementById('btn-settings-save');
     const cancelBtn = document.getElementById('btn-settings-cancel');
@@ -182,7 +180,6 @@ function setupSaveButtonLogic() {
         const modal = document.getElementById('settings-password-modal');
         if (modal) {
             modal.classList.remove('hidden');
-            // Фокус на поле пароля
             setTimeout(() => {
                 document.getElementById('modal-current-password')?.focus();
             }, 100);

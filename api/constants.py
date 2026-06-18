@@ -35,8 +35,7 @@ VERIFICATION_CODE_EMAIL_HTML: str = '''<!DOCTYPE html>
                     <tr>
                         <td style="padding: 40px 40px 30px 40px; text-align:center; color:#222222;">
                             <h2 style="margin:0 0 20px 0; font-size:20px; font-weight:600;">
-                                Если вы запрашивали вход в Tatiana.News,<br>
-                                используйте код ниже.
+                                Код для подтверждения регистрации на портале Tatiana.News:
                             </h2>
                             
                             <!-- Код -->

@@ -1,20 +1,29 @@
+// ==================== ФУНКЦИИ ====================
+
 function updateTextStats(data) {
-    const map = {
+    const fields = {
         'total_news': 'total_news',
         'total_sources': 'total_sources',
-        'total_users': 'total_users',
+        'most_popular_category': 'most_popular_category',
         'most_popular_source': 'most_popular_source'
     };
-    Object.keys(map).forEach(key => {
-        const el = document.getElementById(map[key]);
-        if (el && data[key] !== undefined) el.textContent = data[key];
+
+    Object.keys(fields).forEach(key => {
+        const el = document.getElementById(fields[key]);
+        if (el && data[key] !== undefined) {
+            el.textContent = data[key];
+        }
     });
 }
 
 function renderPieChart(data) {
     const ctx = document.getElementById('pieChart');
     if (!ctx) return;
-    if (pieChartInstance) { pieChartInstance.destroy(); pieChartInstance = null; }
+
+    if (pieChartInstance) {
+        pieChartInstance.destroy();
+        pieChartInstance = null;
+    }
 
     const labels = Object.keys(data);
     const values = Object.values(data);
@@ -22,7 +31,16 @@ function renderPieChart(data) {
 
     pieChartInstance = new Chart(ctx, {
         type: 'pie',
-        data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#fff', borderWidth: 3, hoverOffset: 18 }] },
+        data: {
+            labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors,
+                borderColor: '#fff',
+                borderWidth: 3,
+                hoverOffset: 18
+            }]
+        },
         options: {
             responsive: true,
             maintainAspectRatio: false,
@@ -45,7 +63,11 @@ function renderPieChart(data) {
 function renderBarChart(data) {
     const ctx = document.getElementById('barChart');
     if (!ctx) return;
-    if (barChartInstance) { barChartInstance.destroy(); barChartInstance = null; }
+
+    if (barChartInstance) {
+        barChartInstance.destroy();
+        barChartInstance = null;
+    }
 
     const labels = Object.keys(data);
     const values = Object.values(data);
@@ -77,6 +99,8 @@ function renderBarChart(data) {
     });
 }
 
+// ==================== ЗАГРУЗКА ДАННЫХ ====================
+
 async function loadAllStats() {
     const endpoints = {
         text: 'http://127.0.0.1:8001/get_text_stat',
@@ -86,11 +110,19 @@ async function loadAllStats() {
 
     try {
         const [textRes, pieRes, barRes] = await Promise.all([
-            fetch(endpoints.text), fetch(endpoints.pie), fetch(endpoints.bar)
+            fetch(endpoints.text),
+            fetch(endpoints.pie),
+            fetch(endpoints.bar)
         ]);
 
+        if (!textRes.ok || !pieRes.ok || !barRes.ok) {
+            throw new Error('Один или несколько запросов вернули ошибку');
+        }
+
         const [textData, pieData, barData] = await Promise.all([
-            textRes.json(), pieRes.json(), barRes.json()
+            textRes.json(),
+            pieRes.json(),
+            barRes.json()
         ]);
 
         updateTextStats(textData);
@@ -98,31 +130,39 @@ async function loadAllStats() {
         renderBarChart(barData);
 
     } catch (e) {
-        showToast('Ошибка сервера', duration=2000, type="red");
+        console.error('Ошибка загрузки статистики:', e);
+        
+        if (typeof showToast === 'function') {
+            showToast('Ошибка загрузки данных', 3000, 'red');
+        } else {
+            alert('Не удалось загрузить статистику.');
+        }
     }
 }
 
-// Кнопка "Обновить"
+// ==================== КНОПКА ОБНОВЛЕНИЯ ====================
+
 async function refreshStats() {
     const btn = document.querySelector('.refresh-btn');
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обновление...';
-    }
+    if (!btn) return;
+
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Обновление...';
+
     await loadAllStats();
-    if (btn) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fas fa-sync-alt"></i> <span>Обновить</span>';
-    }
+
+    btn.disabled = false;
+    btn.innerHTML = originalHTML;
 }
+
+// ==================== ИНИЦИАЛИЗАЦИЯ ====================
 
 document.addEventListener('DOMContentLoaded', () => {
     loadAllStats();
-})
 
-loadAllStats();
-
-const refreshBtn = document.querySelector('.refresh-btn');
-if (refreshBtn) {
-    refreshBtn.addEventListener('click', refreshStats);
-}
+    const refreshBtn = document.querySelector('.refresh-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', refreshStats);
+    }
+});

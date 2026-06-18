@@ -7,6 +7,9 @@ class SearchNewsRequest(BaseModel):
     # filters: Optional[Dict[str, Any]] = None
     search_period: Optional[int] = 3
 
+class SearchNewsBysourceIdRequest(BaseModel):
+    source_id: int = 1
+
 class AddNewsRequest(BaseModel):
     user_id: int
     search_string: Optional[str] = None

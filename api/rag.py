@@ -28,7 +28,6 @@ class Trie:
         self.root = TrieNode()
 
     def insert(self, word: str, news_id: int):
-        """Вставляем нормализованное слово и привязываем news_id к концу слова"""
         if not word:
             return
         
@@ -42,21 +41,19 @@ class Trie:
         node.news_ids.add(news_id)
 
     def remove(self, word: str, news_id: int):
-        """Удаляем news_id только из конечного узла слова (не трогаем префиксы)"""
         if not word:
             return
         
         node = self.root
         for char in word:
             if char not in node.children:
-                return  # слова вообще не было
+                return  
             
             node = node.children[char]
 
-        node.news_ids.discard(news_id)   # безопасно, если id уже отсутствует
+        node.news_ids.discard(news_id)   
 
     def search_prefix(self, prefix: str) -> set[int]:
-        """Возвращаем ВСЕ news_id, у которых есть хотя бы одно слово, начинающееся с prefix"""
         if not prefix:
             return set()
         node = self.root
@@ -130,7 +127,6 @@ class SearchEngine:
         return self.news_base_df
     
     def _build_tries(self):
-        """Полная перестройка префиксных деревьев (вызывается только при полном обновлении из БД)"""
         self.title_trie: Trie = Trie()
         self.text_trie: Trie = Trie()
 
@@ -146,17 +142,15 @@ class SearchEngine:
                 self.text_trie.insert(word, news_id)
 
     def vector_search(self, query: str, top_n: int = 10) -> pd.DataFrame:
-        """Поиск по косинусному сходству с использованием предвычисленной матрицы"""
         if self.news_base_df.empty or len(self.doc_matrix) == 0:
             return pd.DataFrame(columns=DF_COLUMNS + ['similarity'])
 
         query_emb = self.encode(query)                    
         query_vec = query_emb.astype(np.float32)
 
-        # similarities = np.dot(self.doc_matrix, query_vec)   
         similarities = cosine_similarity(
-            [query_vec],          # запрос как матрица 1xD
-            self.doc_matrix       # все документы как матрица NxD
+            [query_vec],          
+            self.doc_matrix       
         )[0]
         top_indices = np.argsort(similarities)[::-1][:top_n]
 
@@ -166,11 +160,6 @@ class SearchEngine:
         return results.sort_values(by='similarity', ascending=False)
 
     def prefix_search(self, prefix: str) -> list[dict[str, any]]:
-        """
-        Prefix search по title И text.
-        Приоритет: сначала совпадения в title, потом в text.
-        Возвращает список словарей (готово для JSON/фронта).
-        """
         if not prefix or len(prefix.strip()) < 2:
             return []
 
@@ -190,11 +179,9 @@ class SearchEngine:
         if not ordered_ids:
             return []
 
-        # можно добавить ограничение кол-ва результатов при необходимости
         result_ids = ordered_ids
         result_df = self.news_base_df[self.news_base_df['id'].isin(result_ids)]
 
-        # Сортируем в порядке приоритета (title → text)
         id_rank = {nid: idx for idx, nid in enumerate(ordered_ids)}
         result_df = result_df.copy()
         result_df['__rank'] = result_df['id'].map(id_rank)
@@ -203,7 +190,7 @@ class SearchEngine:
         return result_df.to_dict('records')
     
 
-    def continue_user_request(self):  # продолжает ввод пользователя до наиболее вероятного состояния. надо брать последние запросы пользователей и выдавать наиболее подходящий. обновлять базу запросов каждый час
+    def continue_user_request(self):  # TODO :: продолжает ввод пользователя до наиболее вероятного состояния. надо брать последние запросы пользователей и выдавать наиболее подходящий. обновлять базу запросов каждый час
         pass
 
     def full_text_search(self, user_request: str) -> list[dict]:  # полнотекстовый поиск. принимаемый текст должен полностью входить в какую-то строку

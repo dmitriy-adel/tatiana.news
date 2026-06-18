@@ -65,6 +65,12 @@ function renderVisibleCategories() {
         pill.className = 'category-pill';
         pill.textContent = className;
         pill.dataset.id = classId;
+
+        pill.addEventListener('click', () => {
+            const url = `http://127.0.0.1:8000/search/?source_id=${encodeURIComponent(classId)}`;
+            window.open(url, '_blank');
+        });
+
         container.appendChild(pill);
     });
 
@@ -209,7 +215,6 @@ async function loadMainNewsFeed() {
     }
 }
 
-//Создаёт один блок-секцию для класса новостей
 function createNewsSection(className, newsArray) {
     const section = document.createElement('div');
     section.className = 'news-section';
@@ -254,7 +259,7 @@ function createBigNewsCard(news) {
     `;
 
     card.addEventListener('click', () => {
-        openNews(news.id);   // ← сюда потом сделаем переход на новость
+        openNews(news.id);  
     });
 
     return card;
@@ -282,7 +287,6 @@ function createSmallNewsItem(news) {
     return item;
 }
 
-// октрытие новости в буферной странице
 function openNews(newsId) {
     if (!newsId) {
         showToast(message='newsId не передан', direction=3000, type="red");
@@ -330,10 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (document.getElementById('newsFeed')) { // НОВОЕ
+    if (document.getElementById('newsFeed')) { 
         loadMainNewsFeed();
     }
 
 });
-
-// !!====================== Прослушка ======================!!

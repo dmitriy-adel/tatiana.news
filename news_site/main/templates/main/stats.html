@@ -8,7 +8,7 @@
 <!-- БЛОК 1 (заголовок страницы — чистый, без фона и рамки) -->
 <div class="block block1">
     <h1 class="page-title">Раздел статистики портала</h1>
-    <button class="refresh-btn" onclick="refreshStats()">
+    <button class="refresh-btn">
         <i class="fas fa-sync-alt"></i>
         <span>Обновить</span>
     </button>
@@ -38,10 +38,10 @@
                 </div>
             </div>
             <div class="stat-card">
-                <div class="stat-icon purple"><i class="fas fa-users"></i></div>
+                <div class="stat-icon purple"><i class="fas fa-file"></i></div>
                 <div class="stat-info">
-                    <div class="stat-label">Всего пользователей</div>
-                    <div class="stat-value" id="total_users">—</div>
+                    <div class="stat-label">Самая популярная категория</div>
+                    <div class="stat-value" id="most_popular_category">—</div>
                 </div>
             </div>
             <div class="stat-card">
@@ -80,18 +80,21 @@
             <h2><i class="fas fa-history"></i> История обновлений портала</h2>
         </div>
         <div class="history-scroll" id="history-content">
-            <!-- Примеры записей (можно заменить на свои) -->
             <div class="update-entry">
-                <div class="update-date">03.06.2026</div>
-                <div class="update-text">тутутутутутутуiojwerjonegrjoiergjiorgejioregjioergjioregjioerjgioregjoiergjioregjiojeorgiregjioergjiogerjioregjiojioegrjioergjioergjioergjioergjiorgejioergoierjgoearjgpoaerjgaowerjg[aeogjaeorjga;eoijgr].</div>
-            </div>
-            <div class="update-entry">
-                <div class="update-date">01.06.2026</div>
-                <div class="update-text">апапапапап.</div>
+                <div class="update-date">14.06.2026</div>
+                <div class="update-text">Улучшение взаимодействия пользователей с поддержкой. Добавлено больше категорий для обращений, сокращено время ответа операторов</div>
             </div>
             <div class="update-entry">
                 <div class="update-date">28.05.2026</div>
-                <div class="update-text">кря кря кря.</div>
+                <div class="update-text">Презентация раздела статистики. Теперь каждый пользователь может увидеть общую статистику по порталу</div>
+            </div>
+            <div class="update-entry">
+                <div class="update-date">14.05.2026</div>
+                <div class="update-text">Изменение поискового движка. Теперь система быстрее отдает ответы, а сами ответы стали точнее</div>
+            </div>
+            <div class="update-entry">
+                <div class="update-date">28.04.2026</div>
+                <div class="update-text">Сервис Tatiana.news перешел в стадию закрытого тестирования.</div>
             </div>
         
         </div>
@@ -101,5 +104,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js"></script>
+
+<script src="{% static 'main/js/stats.js' %}"></script>
 
 {% endblock %}

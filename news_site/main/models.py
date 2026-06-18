@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from django.utils.text import slugify
+
 
 class Source(models.Model):
     """Источник новостей"""
@@ -44,7 +46,7 @@ class News(models.Model):
     )
     
     news_class = models.ForeignKey(
-        NewsClass,                    # теперь без кавычек
+        NewsClass,                    
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

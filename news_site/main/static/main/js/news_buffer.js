@@ -1,12 +1,11 @@
-let lastLoadedCommentId = null;   // для пагинации
+let lastLoadedCommentId = null;   
 let isLoadingComments = false;
 
-// инициализация буферной страницы и получение id текущей новости
+
 function initNewsBufferPage() {
     const saveBtn = document.getElementById('save-news-button');
     if (!saveBtn) return;
 
-    // Получаем ID новости из URL (/news/123/)
     const pathParts = window.location.pathname.split('/');
     currentNewsId = pathParts[pathParts.length - 2];
 
@@ -21,7 +20,6 @@ function initNewsBufferPage() {
         }
     });
 
-    // закрытие при клике вне
     document.addEventListener('click', function(e) {
         if (!saveBtn.contains(e.target) && !dropdown.contains(e.target)) {
             dropdown.classList.remove('active');
@@ -29,7 +27,6 @@ function initNewsBufferPage() {
         }
     });
 
-    // закрытие по крестику
     document.getElementById('dropdown-close').addEventListener('click', () => {
         dropdown.classList.remove('active');
         selectedCollections.clear();
@@ -293,7 +290,6 @@ document.addEventListener('click', async function(e) {
 
     const changes = getChangesForSave();
 
-    // Если ничего не изменилось — просто закрываем
     if (changes.toAdd.length === 0 && changes.toRemove.length === 0) {
         document.getElementById('collections-dropdown').classList.remove('active');
         return;
@@ -342,7 +338,6 @@ function initComments() {
 
     if (!commentInput || !sendBtn) return;
 
-    // Поведение плейсхолдера
     commentInput.addEventListener('focus', () => {
         if (commentInput.value === '') commentInput.placeholder = '';
     });
@@ -357,7 +352,6 @@ function initComments() {
     sendBtn.addEventListener('click', sendComment);
     loadMoreBtn.addEventListener('click', loadMoreComments);
 
-    // Первая загрузка
     loadComments();
 }
 
@@ -455,7 +449,6 @@ function createCommentElement(comment) {
         </div>
     `;
 
-    // Лайк и дизлайк
     div.querySelector('.like-btn').addEventListener('click', function() {
         addReaction(this.dataset.commentId, 'like');
     });
@@ -496,12 +489,12 @@ async function sendComment() {
 
         input.value = '';
 
-        // После добавления нового комментария — перезагружаем с начала
+        // после добавления нового комментария — перезагружаем с начала
         lastLoadedCommentId = null;
         await loadComments(false);
 
     } catch (err) {
-        alert('Не удалось отправить комментарий');
+        showToast(message='Не удалось отправить комментарий', type='red', duration=2000);
     } finally {
         sendBtn.disabled = false;
         sendBtn.textContent = 'Отправить';
@@ -523,11 +516,10 @@ async function addReaction(commentId, type) {
             body: JSON.stringify({ comment_id: parseInt(commentId) })
         });
 
-        // После реакции обновляем весь список (можно оптимизировать позже)
         await loadComments(false);
 
     } catch (err) {
-        console.error('Ошибка реакции:', err);
+        showToast(message='Не получилось изменить реакцию', type="red", duration=2000);
     }
 }
 
